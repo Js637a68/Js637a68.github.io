@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Archives | Hexo</title>
+    <title>log4cpp | Hexo</title>
     <meta name="author" content="John Doe" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
@@ -37,6 +37,10 @@
 
 
 <script src="/js/lib/preview.js"></script>
+
+
+
+
 
 
 
@@ -150,26 +154,62 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            
-<div id="archives">
-    
-    <div id="timeline-wrap" ref="timeline">
+            <div class="article">
+    <div>
+        <h1>log4cpp</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/26
+        </span>
         
-        <div class="timeline" data-title="helloworld">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/9/11</div>
-                <a href="/2024/09/11/hello-world/">
-                    <h3>Hello World</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
         
     </div>
+    
+    <div class="content" v-pre>
+        <p>log4j类型日志实现…</p>
+<span id="more"></span>
+
+<h6 id="LOG级别"><a href="#LOG级别" class="headerlink" title="LOG级别"></a>LOG级别</h6><pre><code>typedefenum &#123;
+     EMERG  = 0,
+     FATAL  = 0,
+     ALERT  = 100,
+     CRIT   = 200,
+     ERROR  = 300,
+     WARN   = 400,
+     NOTICE = 500,
+     INFO   = 600,
+     DEBUG  = 700,
+     NOTSET = 800
+ &#125;PriorityLevel;
+</code></pre>
+<p>Pattern</p>
+<pre><code>void log4cpp::PatternLayout::setConversionPattern  (conststd::string&amp;  conversionPattern)  throw(ConfigureFailure) [virtual]
+
+/*其中参数类型为std::string，类似于C语言中的printf，使用格式化字符串来描述输出格式，其具体含义如下：
+*  u %c category；
+*  u %d 日期；日期可以进一步的设置格式，用花括号包围，例如%d&#123;%H:%M:%S,%l&#125; 或者 %d&#123;%d %m %Y%H:%M:%S,%l&#125;。如果不设置具体日期格式，则如下默认格式被使用“Wed Jan 02 02:03:55 1980”。日期的格式符号与ANSI C函数strftime中的一致。但增加了一个格式符号%l，表示毫秒，占三个十进制位。
+*  u %m 消息；
+*  u %n 换行符，会根据平台的不同而不同，但对于用户透明；
+*  u %p 优先级；
+*  u %r 自从layout被创建后的毫秒数；
+*  u %R 从1970年1月1日0时开始到目前为止的秒数；
+*  u %u 进程开始到目前为止的时钟周期数；
+*  u %x NDC。
+*/
+</code></pre>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
 </div>
 
             <footer id="footer">
@@ -200,6 +240,12 @@
         
     </div>
     <script src="/js/main.js"></script>
+    
+    
+
+
+
+
     
 </body>
 </html>

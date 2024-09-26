@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>index | Hexo</title>
+    <title>Archives | Hexo</title>
     <meta name="author" content="John Doe" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
@@ -37,10 +37,6 @@
 
 
 <script src="/js/lib/preview.js"></script>
-
-
-
-
 
 
 
@@ -154,31 +150,40 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            <div class="article">
-    <div>
-        <h1>index</h1>
-    </div>
-    <div class="info">
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/9/22
-        </span>
+            
+<div id="archives">
+    
+    <div id="timeline-wrap" ref="timeline">
         
+        <div class="timeline" data-title="helloworld">
+            <div class="timeline-tail"></div>
+            <div class="timeline-content">
+                <div class="item-time">2024/9/11</div>
+                <a href="/2024/09/11/hello-world/">
+                    <h3>Hello World</h3>
+                </a>
+                <div class="info">
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="timeline" data-title="log4cpp">
+            <div class="timeline-tail"></div>
+            <div class="timeline-content">
+                <div class="item-time">2024/9/26</div>
+                <a href="/2024/09/26/log4cpp/">
+                    <h3>log4cpp</h3>
+                </a>
+                <div class="info">
+                    
+                    
+                </div>
+            </div>
+        </div>
         
     </div>
-    
-    <div class="content" v-pre>
-        
-    </div>
-    
-    
-    
-    
-    
-    
-    
 </div>
 
             <footer id="footer">
@@ -209,12 +214,6 @@
         
     </div>
     <script src="/js/main.js"></script>
-    
-    
-
-
-
-
     
 </body>
 </html>
