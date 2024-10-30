@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>rbtree | Hexo</title>
+    <meta name="author" content="John Doe" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.cn" />
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin />
+<link
+    rel="stylesheet"
+    href="https://fonts.googleapis.cn/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap"
+/>
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.alicdn.com/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>HEXO</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;Home</span>
+        </a>
+        
+        <a href="/about">
+            <i class="fa-solid fa-id-card fa-fw"></i>
+            <span>&ensp;About</span>
+        </a>
+        
+        <a href="/archives">
+            <i class="fa-solid fa-box-archive fa-fw"></i>
+            <span>&ensp;Archives</span>
+        </a>
+        
+        <a href="/categories">
+            <i class="fa-solid fa-bookmark fa-fw"></i>
+            <span>&ensp;Categories</span>
+        </a>
+        
+        <a href="/tags">
+            <i class="fa-solid fa-tags fa-fw"></i>
+            <span>&ensp;Tags</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;HEXO</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Home</div>
+                    </div>
+                </a>
+                
+                <a href="/about">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-id-card fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">About</div>
+                    </div>
+                </a>
+                
+                <a href="/archives">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-box-archive fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Archives</div>
+                    </div>
+                </a>
+                
+                <a href="/categories">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-bookmark fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Categories</div>
+                    </div>
+                </a>
+                
+                <a href="/tags">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-tags fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Tags</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>rbtree</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/10/15
+        </span>
+        
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <h3 id="Rbtree学习"><a href="#Rbtree学习" class="headerlink" title="Rbtree学习"></a>Rbtree学习</h3><blockquote>
+<p>  <strong>rbtree的几个原则</strong></p>
+<ul>
+<li>（<strong>颜色属性</strong>）节点非黑即红</li>
+<li>（<strong>根属性</strong>）根节点一定是黑色</li>
+<li>（<strong>叶子属性</strong>）叶子节点（NIL）一定是黑色</li>
+<li>（<strong>红色属性</strong>）每个红色节点的两个子节点，都为黑色。(从每个叶子到根的所有路径上不能有两个连续的红色节点)</li>
+<li>（<strong>黑色属性</strong>）从任一节点到其每个叶子的所有路径，都包含相同数目的黑色节点。</li>
+</ul>
+</blockquote>
+<hr>
+<span id="more"></span>
+
+<p><strong>rbtree平衡调整的两个手段</strong>： 旋转 和 变色</p>
+<p>rbtree的平衡调整需要关注两个场景：当父亲节点为红色</p>
+<pre><code class="c++">叔叔节点为红：
+    即父亲叔叔都为红-》调整为黑，同时爷爷变红
+    爷爷向上递推调整
+
+叔叔节点为黑：
+    1、LL型失衡：变色、对爷爷左旋或右旋
+            privot，root颜色取反，旋转
+    
+    2、LR型失衡：对父亲旋转-》LL型
+
+## 说白了即满足黑色属性和红色属性因此
+
+# 平衡调整代码：
+inline void
+Rb_tree_rebalance(Rb_tree_node_base* __x, Rb_tree_node_base*&amp; __root)
+&#123;
+__x-&gt;_color = red;
+// 隐藏条件 父节点红色祖父节点一定黑色
+while (__x != __root &amp;&amp; __x-&gt;_parent-&gt;_color == red)
+&#123;
+    /*
+    *  根节点一定是黑色
+    *  判断插入节点在左右
+    *  然后再判断父节点和叔叔节点是红色还是异色
+    *  红色直接变色
+    *  异色则考虑LR型，再变色
+    */
+    if (__x-&gt;_parent == __x-&gt;_parent-&gt;_parent-&gt;_left)
+    &#123;
+        Rb_tree_node_base* __y = __x-&gt;_parent-&gt;_parent-&gt;right;
+        if (__y &amp;&amp; __y-&gt;_color == red)
+        &#123;
+            __x-&gt;_parent-&gt;_color = black;
+            __y-&gt;_color = black;
+            __x-&gt;_parent-&gt;parent-&gt;_color = red;
+            __x = __x-&gt;_parent;
+        &#125;
+        else
+        &#123;
+            if (__x == __x-&gt;_parent-&gt;right)
+            &#123;
+                __x == __x-&gt;_parent;
+                Rb_tree_rotate_left(__x, __root);
+            &#125;
+
+            __x-&gt;_parent-&gt;_color = black;
+            __x-&gt;_parent-&gt;_parent-&gt;_color = red;
+            Rb_trer_rotate_right(__x-&gt;_parent-&gt;_parent, __root);
+        &#125;
+    &#125;
+    else &#123;
+        Rb_tree_node_base* __y = __x-&gt;_parent-&gt;_parent-&gt;_left;
+        if (__y &amp;&amp; __y-&gt; _color == red) 
+        &#123;
+            __x-&gt;_parent-&gt;_color = black;
+            __y-&gt;_color = black;
+            __x-&gt;_parent-&gt;_parent-&gt;_color = red;
+            __x = __x-&gt;_parent-&gt;_parent;
+        &#125;
+        else 
+        &#123;
+            if (__x == __x-&gt;_parent-&gt;_left) 
+            &#123;
+                __x = __x-&gt;_parent;
+                Rb_trer_rotate_right(__x, __root);
+            &#125;
+            __x-&gt;_parent-&gt;_color = black;
+            __x-&gt;_parent-&gt;_parent-&gt;_color = red;
+            Rb_tree_rotate_left(__x-&gt;_parent-&gt;_parent, __root);
+        &#125;
+    &#125;
+&#125;
+__root-&gt;_color = black;
+&#125;
+            
+</code></pre>
+<p><strong>由此可以很快得出插入、删除的操作</strong></p>
+<pre><code class="c++">/*
+将复杂问题拆分简单问题
+先列举无孩子、只有一个孩子情况，再判断自己和兄弟颜色
+*/
+
+Rb_tree_node_base* erase_aux(Rb_tree_node_base* x, Rb_tree_node_base* root)
+&#123;   
+    if(x-&gt;left == 0 &amp;&amp; x-&gt;right == 0)
+    &#123;   // 无孩子节点
+        if(x-&gt;color == red)
+        &#123;
+            if(x == x-&gt;parent-&gt;left) x-&gt;parent-&gt;left = nullptr;
+            else x-&gt;parent-&gt;right = nullptr;
+            return x;
+        &#125;
+        else    // 兄弟必定存在，黑色属性
+        &#123;
+            Rb_tree_node_base* p = x-&gt;parent;
+            Rb_tree_node_base* bro = p-&gt;left == x ? p-&gt;right : p-&gt;left;
+            if(bro-&gt;color == red)
+            &#123;   // bro为红，则必有两个孩子节点都为黑，p为黑
+                if(bro == p-&gt;left)
+                &#123;
+                    bro-&gt;right-&gt;color = red;
+                    bro-&gt;color = black;
+                    rotate_right(p);
+                &#125;
+                else
+                &#123;
+                    bro-&gt;left-&gt;color = red;
+                    bro-&gt;color = black;
+                    rotate_left(p);
+                &#125;
+            &#125;
+            else
+            &#123;   // bro为黑
+                if(bro-&gt;left == 0 &amp;&amp; bro-&gt;right == 0) 
+                &#123;
+                    bro-&gt;color = red;
+                    p-&gt;color = black;
+                &#125; 
+                else if(bro-&gt;right == 0)    // bro只有一个红孩子
+                &#123;   
+                    if(bro == p-&gt;left)
+                    &#123; 
+                        bro-&gt;left-&gt;color = black;
+                        bro-&gt;color =  p-&gt;color;
+                        p-&gt;color = black;
+                        rotate_right(p);
+                    &#125;
+                    else(bro == p-&gt;right) 
+                    &#123; &#125; // 同理
+                &#125;
+                else if(bro-&gt;left == 0)
+                &#123;
+                    // 同理            
+                &#125;
+                else    有两个孩子，都为红色
+                &#123;
+                    if(bro == p-&gt;left)
+                    &#123;
+                        bro-&gt;left-&gt;color = black;
+                        bro-&gt;color = p-&gt;color;
+                        p-&gt;color = black;
+                        rotate_right(p);
+                    &#125;
+                    else
+                    &#123;&#125; // 同理
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    else if(x-&gt;right == 0) // x只有有左孩子
+    &#123;   // 因为只有一个孩子，必为红色，直接删除
+    &#125;
+    else // 只有有孩子，同理
+    &#123;
+    &#125;
+&#125;
+
+// 最后若有两个孩子，则跟前驱后继的一个值对换，转换到上面的其中一种情况
+</code></pre>
+<hr>
+<h4 id="常见面试题"><a href="#常见面试题" class="headerlink" title="常见面试题"></a>常见面试题</h4><blockquote>
+<p>  BST和AVL区别：</p>
+<p>  BST没有自平衡，查找效率容易变成O(n)，引入左右子树高度差保证O(logn)<br>  有AVL为什么还要Rbtree：</p>
+<p>  AVL的左右子树高度差不能超过1，每次进行插入&#x2F;删除操作时，几乎都需要通过旋转操作保持平衡<br>  在频繁进行插入&#x2F;删除的场景中，频繁的旋转操作使得AVL的性能大打折扣<br>  红黑树通过牺牲严格的平衡，换取插入&#x2F;删除时少量的旋转操作，<br>  整体性能优于AVL<br>  红黑树插入时的不平衡，不超过两次旋转就可以解决；删除时的不平衡，不超过三次旋转就能解决<br>  红黑树的红黑规则，保证最坏的情况下，也能在O ( log n）时间内完成查找操作。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>AVL rbtree区别</p>
+</blockquote>
+<p>1、调整平衡的实现机制不同</p>
+<p>红黑树根据路径上黑色节点数目一致，来确定是否失衡，如果失衡，就通过变色和旋转来恢复</p>
+<p>AVL根据树的平衡因子(所有节点的左右子树高度差的绝对值不超过1)，来确定是否失衡，如果失衡，就通过旋转来恢复</p>
+<p>2、红黑树的插入效率更高</p>
+<p>红黑树是用非严格的平衡来换取增删节点时候旋转次数的降低，任何不平衡都会在三次旋转之内解决，</p>
+<p>红黑树并不追求“完全平衡”，它只要求部分地达到平衡要求，降低了对旋转的要求，从而提高了性能</p>
+<p>而AVL是严格平衡树(高度平衡的二叉搜索树)，因此在增加或者删除节点的时候，根据不同情况，旋转的次数比红黑树要多。</p>
+<p>所以红黑树的插入效率更高</p>
+<p>3、红黑树统计性能比AVL树更高</p>
+<p>红黑树能够以O(log n) 的时间复杂度进行查询、插入、删除操作。</p>
+<p>AVL树查找、插入和删除在平均和最坏情况下都是O(log n)。</p>
+<p>红黑树的算法时间复杂度和AVL相同，但统计性能比AVL树更高，</p>
+<p>4、适用性：AVL查找效率高</p>
+<p>如果你的应用中，查询的次数远远大于插入和删除，那么选择AVL树，如果查询和插入删除次数几乎差不多，应选择红黑树。</p>
+<p>即，有时仅为了排序（建立-遍历-删除），不查找或查找次数很少，R-B树合算一些</p>
+<hr>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2022 - 2024 Hexo
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;John Doe
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+</body>
+</html>

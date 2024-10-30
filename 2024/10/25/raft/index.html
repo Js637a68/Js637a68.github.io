@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Archives | Hexo</title>
+    <title>raft | Hexo</title>
     <meta name="author" content="John Doe" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
@@ -37,6 +37,10 @@
 
 
 <script src="/js/lib/preview.js"></script>
+
+
+
+
 
 
 
@@ -150,166 +154,88 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            
-<div id="archives">
-    
-    <div id="timeline-wrap" ref="timeline">
+            <div class="article">
+    <div>
+        <h1>raft</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/10/25
+        </span>
         
-        <div class="timeline" data-title="helloworld">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/9/11</div>
-                <a href="/2024/09/11/hello-world/">
-                    <h3>Hello World</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="log4cpp">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/9/26</div>
-                <a href="/2024/09/26/log4cpp/">
-                    <h3>log4cpp</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="memoryblock_in_vc">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/9/28</div>
-                <a href="/2024/09/28/memoryblock-in-VC/">
-                    <h3>memoryblock_in_VC</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/9/28</div>
-                <a href="/2024/09/28/test/">
-                    <h3></h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="hook">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/10/1</div>
-                <a href="/2024/10/01/hook/">
-                    <h3>hook</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="宏定义用法">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/10/4</div>
-                <a href="/2024/10/04/%E5%AE%8F%E5%AE%9A%E4%B9%89%E7%94%A8%E6%B3%95/">
-                    <h3>宏定义用法</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="rbtree">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/10/15</div>
-                <a href="/2024/10/15/rbtree/">
-                    <h3>rbtree</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="filesys">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/10/19</div>
-                <a href="/2024/10/19/filesys/">
-                    <h3>filesys</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="raft">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/10/25</div>
-                <a href="/2024/10/25/raft/">
-                    <h3>raft</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="co-net">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/10/28</div>
-                <a href="/2024/10/28/co-net/">
-                    <h3>co-net</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
-        <div class="timeline" data-title="mprpc">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/10/30</div>
-                <a href="/2024/10/30/mprpc/">
-                    <h3>mprpc</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
         
     </div>
+    
+    <div class="content" v-pre>
+        <h2 id="raft"><a href="#raft" class="headerlink" title="raft"></a>raft</h2><p>相比于Paxos，一个易于理解的共识算法（共识即实现复制状态机：），并将其分解为以下三个子问题，主要有两钟RPC：Vote RPC和AppendEntries RPC</p>
+<p><strong>领导者选举</strong><br>leader follow candicate</p>
+<ol>
+<li>每个follow只有一张选票，先来显得原则</li>
+<li>follow什么时候会投票：requestVote rpc的任期号大于自己，否则requestVote rpc最新日志不比自己旧（日志索引+日志任期号 确定一个日志entry）</li>
+<li>只有candicate的日志和大多数的follow一样新时，即<strong>包含之前任期提交过的日志</strong>才会能当选leader</li>
+<li>什么时候当选leader，超过一半选票（为什么节点为奇数—在发生网络分区的时候…）</li>
+</ol>
+<pre><code class="c++">struct RequestVote
+&#123;
+    int term;			// 当前任期号
+    int candidateId;	// 自己的id
+    int lastLogIndex;	// 自己最后一个日志索引
+    int lastLogTerm;	// 自己最后一个日志的任期号
+&#125;;
+struct ResponseVote
+&#123;
+    int term;			// 自己当前任期号
+    bool voteGranted;	// 是否投票
+&#125;;
+</code></pre>
+<p><strong>日志复制</strong></p>
+<ul>
+<li>提交：执行日志指令到状态机，只有日志复制到<strong>多数节点</strong>，并且是<strong>当期</strong>的日志才能提交</li>
+<li><strong>一致性检查</strong>：在appendentries rpc中放入前一个日志索引和任期，follow找不到该日志则拒绝，leader发送前一个，直到相同。因此将通过一致性检查来确保状态一致：</li>
+</ul>
+<blockquote>
+<p>当前日志任期不同时：</p>
+<p>​	leader只会改变follow的日志中日志任期&lt;&#x3D;自己的，并且删除包含<strong>上一个日志任期到当前日志任期</strong>的之间的<strong>follow</strong>的日志</p>
+<p>当前日志任期相同，索引不同时：</p>
+<p>​	补缺删增</p>
+<p>其余情况在领导选举时便已经排除</p>
+</blockquote>
+<pre><code class="c++">struct AppendEntriesRequest
+&#123;
+    int term;			// 任期号
+    int leader;			// 自己id
+    int preLogIndex;	// 前一个日志索引
+    int preLogTerm;		// 前一个日志任期号
+    entries;			// 
+    int leaderCommit;	// 最新已提交日志号
+&#125;;
+struct AppendEntriesResponse
+&#123;
+    int term;		// 任期号
+    bool success;	// 是否复制成功
+&#125;;
+</code></pre>
+<p><strong>安全性</strong></p>
+<ol>
+<li>即leader选举中一定包含之前任期的所有被提交日志条，最后日志任期号大的日志更<strong>新</strong>，否则日志索引更大的日志更<strong>新</strong></li>
+<li>只有当前任期的日志才能提交</li>
+</ol>
+<p><strong>集群成员变更</strong></p>
+<p>使用更加简单的单节点集群成员变更，每次只变更一个节点，防止脑裂，这样新旧配置集群一定有重合</p>
+<p><strong>三个特征</strong></p>
+<p>strong leader	leader election	membership changes</p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
 </div>
 
             <footer id="footer">
@@ -340,6 +266,12 @@
         
     </div>
     <script src="/js/main.js"></script>
+    
+    
+
+
+
+
     
 </body>
 </html>
