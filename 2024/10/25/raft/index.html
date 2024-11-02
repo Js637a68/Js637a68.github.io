@@ -227,6 +227,8 @@ struct AppendEntriesResponse
 <p>使用更加简单的单节点集群成员变更，每次只变更一个节点，防止脑裂，这样新旧配置集群一定有重合</p>
 <p><strong>三个特征</strong></p>
 <p>strong leader	leader election	membership changes</p>
+<p><strong>日志压缩</strong></p>
+<p>使用快照，当日志占用空间太多，一个key只保留最新的一份value</p>
 
     </div>
     
