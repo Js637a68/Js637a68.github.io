@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>动态规划 | Jerold‘s PNote</title><meta name="author" content="Jerold"><meta name="copyright" content="Jerold"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="dp0-1背包  至多装capacity，求方案数&#x2F;最大价值和  恰好装capacity，求方案数&#x2F;最大&#x2F;最小价值和  至少装capacity，求方案数&#x2F;最小价值和   可以获得状态转移方程： 12dfs(i,c) &#x3D; max(dfs(i-1,c), dfs(i-1,c-w[i]) + v[i])dfs(i,c) &#x3D; dfs(i-1,c)+dfs(i-1,c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动态规划">
+<meta property="og:url" content="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/dp/index.html">
+<meta property="og:site_name" content="Jerold‘s PNote">
+<meta property="og:description" content="dp0-1背包  至多装capacity，求方案数&#x2F;最大价值和  恰好装capacity，求方案数&#x2F;最大&#x2F;最小价值和  至少装capacity，求方案数&#x2F;最小价值和   可以获得状态转移方程： 12dfs(i,c) &#x3D; max(dfs(i-1,c), dfs(i-1,c-w[i]) + v[i])dfs(i,c) &#x3D; dfs(i-1,c)+dfs(i-1,c">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/covers/16.jpg">
+<meta property="article:published_time" content="2024-09-03T16:24:57.000Z">
+<meta property="article:modified_time" content="2024-09-03T16:24:57.000Z">
+<meta property="article:author" content="Jerold">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/covers/16.jpg"><link rel="shortcut icon" href="/img/logo.jpg"><link rel="canonical" href="http://example.com/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/dp/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const hour = new Date().getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (theme === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else theme === 'light' ? activateLightMode() : activateDarkMode()
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '动态规划',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  isShuoshuo: false
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bg2.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/16.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Jerold‘s PNote</span></a><a class="nav-page-title" href="/"><span class="site-name">动态规划</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">动态规划</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-09-03T16:24:57.000Z" title="发表于 2024-09-04 2024-09-04T00:24:57+08:00">2024-09-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-09-03T16:24:57.000Z" title="更新于 2024-09-04 2024-09-04T00:24:57+08:00">2024-09-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h4 id="dp"><a href="#dp" class="headerlink" title="dp"></a>dp</h4><p><strong>0-1背包</strong></p>
+<ul>
+<li><p>至多装capacity，求方案数&#x2F;最大价值和</p>
+</li>
+<li><p>恰好装capacity，求方案数&#x2F;最大&#x2F;最小价值和</p>
+</li>
+<li><p>至少装capacity，求方案数&#x2F;最小价值和</p>
+</li>
+</ul>
+<p>可以获得状态转移方程：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dfs</span>(i,c) = <span class="built_in">max</span>(<span class="built_in">dfs</span>(i<span class="number">-1</span>,c), <span class="built_in">dfs</span>(i<span class="number">-1</span>,c-w[i]) + v[i])</span><br><span class="line"><span class="built_in">dfs</span>(i,c) = <span class="built_in">dfs</span>(i<span class="number">-1</span>,c)+<span class="built_in">dfs</span>(i<span class="number">-1</span>,c-w[i])</span><br></pre></td></tr></table></figure>
+
+<p><strong>目标和</strong></p>
+<p>通过转换就可以得到0-1背包的一种，即求恰好时的方案数</p>
+<p>记忆化搜索可以1：1地翻译成递推</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f[i][c] = f[i<span class="number">-1</span>][c] + f[i<span class="number">-1</span>][c-w[i]]</span><br><span class="line"><span class="comment">// 为了避免负数</span></span><br><span class="line">f[i<span class="number">+1</span>][c] = f[i][c] + f[i][c-w[i]]</span><br></pre></td></tr></table></figure>
+
+<p>倘若空间优化成一个数组</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">f[c] = f[c] + f[c-w[i]]</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">这里从左→右计算，考虑到 f[c-w[j]]可能已经覆盖成f[i+1][c-w[i]]，而不是一开始的f[i][c-w[i]]，因此从右→左计算</span></span><br><span class="line"><span class="comment">*</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>完全背包</strong>（可以重复选）</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">f[i<span class="number">+1</span>][c] = <span class="built_in">min</span>(f[i][c], f[i<span class="number">+1</span>][c-w[i]]+v[i])</span><br><span class="line"><span class="comment">// 优化空间</span></span><br><span class="line">f[c] = <span class="built_in">min</span>(f[c], f[c-w[i]]+v[i])</span><br><span class="line"><span class="comment">// 这时候就要从左→右计算了</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>[!NOTE]</p>
+<p>总结一下上面空间的优化的两种情况：</p>
+<ul>
+<li>当f[c-w[i]]是f[i+1]的时，即我们需要往前获最新的元素，左👉右</li>
+<li>当f[c-w[i]]是f[i]的时，即我们需要往前获取之前的元素，左👈右</li>
+</ul>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%AE%97%E6%B3%95/">算法</a></div><div class="post-share"><div class="social-share" data-image="/img/covers/16.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/" title="排序"><img class="cover" src="/img/covers/6.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">排序</div></div><div class="info-2"><div class="info-item-1">快速排序通过分而治之实现nlog(n)的排序算法 c++实现 12345678910111213141516template&lt;typename T&gt;void quick_sort(vector&lt;T&gt; arr, int start, int end)&#123;	if(start &gt;= end) return;	T mid = arr[start];	int left = start, right = end;	while(left &lt; right) &#123;		while(arr[right] &gt;= mid &amp;&amp; left &lt; right) --right;        while(arr[left] &lt;= mid &amp;&amp; left &lt; right) ++left;		std::swap(arr[left], arr[right]);	&#125;		std::swap(arr[left], arr[start]);    	quick_sort(arr, start,...</div></div></div></a><a class="pagination-related" href="/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/gitleran/" title="git使用"><img class="cover" src="/img/covers/6.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">git使用</div></div><div class="info-2"><div class="info-item-1">git基础特点  分布式版本控制系统，直接记录快照（blob对象），而不是保存差异累计  存储项目随时间改变的快照  可靠性和本地执行，本地拥有完整的历史记录  轻量级分支  完整性：存储文件前通过SHA-1计算校验和，确保  几乎只增加数据而不丢失或修改，快照流   状态：  已修改：在工作区修改了文件  已暂存：添加到暂存区  已提交：保存到git仓库   git配置 /etc/gitconfig 文件：包含系统上每一个用户及他们仓库的通用配置。 如果使用带有 --system 选项的 git config 时，它会从此文件读写配置变量。 ~/.gitconfig 或 ~/.config/git/config 文件：只针对当前用户。 可以传递 --global 选项让 Git 读写此文件。 当前使用仓库的 Git 目录中的 config 文件（就是 .git/config）：针对该仓库。  每一个级别覆盖上一级别的配置 命令： 1234git config --global user.name &quot;Js&quot;git config --global...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/" title="排序"><img class="cover" src="/img/covers/6.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-11</div><div class="info-item-2">排序</div></div><div class="info-2"><div class="info-item-1">快速排序通过分而治之实现nlog(n)的排序算法 c++实现 12345678910111213141516template&lt;typename T&gt;void quick_sort(vector&lt;T&gt; arr, int start, int end)&#123;	if(start &gt;= end) return;	T mid = arr[start];	int left = start, right = end;	while(left &lt; right) &#123;		while(arr[right] &gt;= mid &amp;&amp; left &lt; right) --right;        while(arr[left] &lt;= mid &amp;&amp; left &lt; right) ++left;		std::swap(arr[left], arr[right]);	&#125;		std::swap(arr[left], arr[start]);    	quick_sort(arr, start,...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#dp"><span class="toc-number">1.</span> <span class="toc-text">dp</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Jerold</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

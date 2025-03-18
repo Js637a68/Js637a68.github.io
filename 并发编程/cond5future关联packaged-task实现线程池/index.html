@@ -1,0 +1,152 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>cond5future关联packaged_task实现线程池 | Jerold‘s PNote</title><meta name="author" content="Jerold"><meta name="copyright" content="Jerold"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="这个人很懒，什么也没留下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cond5future关联packaged_task实现线程池">
+<meta property="og:url" content="http://example.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/cond5future%E5%85%B3%E8%81%94packaged-task%E5%AE%9E%E7%8E%B0%E7%BA%BF%E7%A8%8B%E6%B1%A0/index.html">
+<meta property="og:site_name" content="Jerold‘s PNote">
+<meta property="og:description" content="这个人很懒，什么也没留下">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/covers/13.jpg">
+<meta property="article:published_time" content="2024-10-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-10T16:00:00.000Z">
+<meta property="article:author" content="Jerold">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/covers/13.jpg"><link rel="shortcut icon" href="/img/logo.jpg"><link rel="canonical" href="http://example.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/cond5future%E5%85%B3%E8%81%94packaged-task%E5%AE%9E%E7%8E%B0%E7%BA%BF%E7%A8%8B%E6%B1%A0/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const hour = new Date().getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (theme === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else theme === 'light' ? activateLightMode() : activateDarkMode()
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'cond5future关联packaged_task实现线程池',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  isShuoshuo: false
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bg2.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/13.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Jerold‘s PNote</span></a><a class="nav-page-title" href="/"><span class="site-name">cond5future关联packaged_task实现线程池</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">cond5future关联packaged_task实现线程池</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-10-10T16:00:00.000Z" title="发表于 2024-10-11 2024-10-11T00:00:00+08:00">2024-10-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-10-10T16:00:00.000Z" title="更新于 2024-10-11 2024-10-11T00:00:00+08:00">2024-10-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">并发编程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"></article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%B9%B6%E5%8F%91/">并发</a></div><div class="post-share"><div class="social-share" data-image="/img/covers/13.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/rbtree/" title="红黑树"><img class="cover" src="/img/covers/6.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">红黑树</div></div><div class="info-2"><div class="info-item-1">Rbtree学习   rbtree的几个原则  （颜色属性）节点非黑即红 （根属性）根节点一定是黑色 （叶子属性）叶子节点（NIL）一定是黑色 （红色属性）每个红色节点的两个子节点，都为黑色。(从每个叶子到根的所有路径上不能有两个连续的红色节点) （黑色属性）从任一节点到其每个叶子的所有路径，都包含相同数目的黑色节点。      rbtree平衡调整的两个手段： 旋转 和 变色 rbtree的平衡调整需要关注两个场景：当父亲节点为红色 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475叔叔节点为红：    即父亲叔叔都为红-》调整为黑，同时爷爷变红    爷爷向上递推调整叔叔节点为黑：    1、LL型失衡：变色、对爷爷左旋或右旋            privot，root颜色取反，旋转        2、LR型失衡：对父亲旋转-》LL型##...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/cond6%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97%E5%8F%8A%E4%B8%A4%E7%A7%8D%E5%B9%B6%E8%A1%8C%E8%AE%BE%E8%AE%A1/" title="cond6并行计算及两种并发模型"><img class="cover" src="/img/covers/2.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">cond6并行计算及两种并发模型</div></div><div class="info-2"><div class="info-item-1">并行计算利用cpu多核计算子集，然后合并返回结果；例如在快排中，本身计算privot左边，交给子线程计算privot右边 倘若我们要实现一套通用的规则而不依赖于存储容器，那就可以使用函数式编程 程序由一系列函数组成，每一步计算就是函数求值，并且不改变状态和数据（那样拷贝数据返回新值挺费内存吧） 12345678910111213141516171819202122232425template&lt;class T&gt;std::list&lt;T&gt; parallel_quick_sort(std::list&lt;T&gt; input) &#123;	if(input.empty()) return input;    std::list&lt;T&gt; result;    // 转移，前插    result.splice(result.begin(), input, input.begin());    T const&amp; pivot = *result.begin();    基于privot拆分链表    auto divide_point =...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/con2%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/" title="条件变量实现安全队列和信号量"><img class="cover" src="/img/covers/2.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-10</div><div class="info-item-2">条件变量实现安全队列和信号量</div></div><div class="info-2"><div class="info-item-1">条件变量实现安全队列一些源码的解释 12#include &lt;condition_variable&gt;std::codition_variable cv;  &#x2F;&#x2F; wake up one waiter 1void notify_one() noexcept  &#x2F;&#x2F; wake up all waiters 1void notify_all() noexcept   Nothing to do to comply with LWG-2135 because std::mutex lock&#x2F;unlock are nothrow 1void wait(unique_lock&lt;mutex&gt;&amp; _Lck) &#x2F;&#x2F; wait for signal and test predicate 123456template &lt;class _Predicate&gt;void wait(unique_lock&lt;mutex&gt;&amp; _Lck, _Predicate _Pred)...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/con1%E4%BA%92%E6%96%A5%E5%92%8C%E9%94%81/" title="互斥和锁"><img class="cover" src="/img/covers/1.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-10</div><div class="info-item-2">互斥和锁</div></div><div class="info-2"><div class="info-item-1">互斥c++通过std::mutex实现锁机制，确保多线程下只有一个进入临界区 1234#include &lt;mutex&gt;std::mutex mtx;mtx.lock();mtx.unlock();  层级锁自定义锁添加权重来保证每次加锁顺序和解锁顺序，数值越大权重越高 12345678910111213141516171819class hmutex &#123;public: hmutex(unsigned value):cur(val),pre(0)void lock()&#123;	if(cur &lt;= val) std::logic_error(&quot;faild&quot;);	mtx.lock();	pre=cur,cur=val;&#125;void unlock()&#123;	if(cur != val) std::logic_error(&quot;faild&quot;);	mtx.unlock();	cur=pre;&#125;private:std::mutex mtx;unsigned val;unsigned...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/cond3CAS/" title="CAS实现无锁队列"><img class="cover" src="/img/covers/7.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-10</div><div class="info-item-2">CAS实现无锁队列</div></div><div class="info-2"><div class="info-item-1"> 悲观锁：阻塞线程，等待锁释放，发生上下文切换 乐观锁：修改时检查，失败则不断重试 汇编原子操作： 12345678910int inc(int* value, int add) &#123;	int old;    __asm__ volatile (         &quot;lock; xaddl %2, %1;&quot;   // 指令1：lock; 指令2: xaddl, 操作数占位符：%1, %2         : &quot;=a&quot; (old)            // 输出：结果放入通用寄存器eax         : &quot;m&quot; (*value), &quot;a&quot; (add)   // 输入：操作数1（内存），操作数2（寄存器eax）         : &quot;cc&quot;, &quot;memory&quot;            // 编译方式，内存     );    return...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/cond4%E5%B9%B6%E5%8F%91%E6%8A%80%E6%9C%AF/" title="并发技术future类"><img class="cover" src="/img/covers/1.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-10</div><div class="info-item-2">并发技术future类</div></div><div class="info-2"><div class="info-item-1">Future使用搭配async启动一个异步任务，返回一个future对象 1234std::future&lt;int&gt; res = std::async(std::launch::async, []&#123;    std::this_thread::sleep_for(std::chrono::seconds(5));    return 1;&#125;); int i =...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/cond6%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97%E5%8F%8A%E4%B8%A4%E7%A7%8D%E5%B9%B6%E8%A1%8C%E8%AE%BE%E8%AE%A1/" title="cond6并行计算及两种并发模型"><img class="cover" src="/img/covers/2.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-11</div><div class="info-item-2">cond6并行计算及两种并发模型</div></div><div class="info-2"><div class="info-item-1">并行计算利用cpu多核计算子集，然后合并返回结果；例如在快排中，本身计算privot左边，交给子线程计算privot右边 倘若我们要实现一套通用的规则而不依赖于存储容器，那就可以使用函数式编程 程序由一系列函数组成，每一步计算就是函数求值，并且不改变状态和数据（那样拷贝数据返回新值挺费内存吧） 12345678910111213141516171819202122232425template&lt;class T&gt;std::list&lt;T&gt; parallel_quick_sort(std::list&lt;T&gt; input) &#123;	if(input.empty()) return input;    std::list&lt;T&gt; result;    // 转移，前插    result.splice(result.begin(), input, input.begin());    T const&amp; pivot = *result.begin();    基于privot拆分链表    auto divide_point =...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/thread1/" title="C++线程与源码学习"><img class="cover" src="/img/covers/11.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-10</div><div class="info-item-2">C++线程与源码学习</div></div><div class="info-2"><div class="info-item-1">C++线程std::thread创建thread封装线程操作，通过std::tread(func)传入函数指针，创建一个对象并初始化即开启一个线程执行 注意： 这里可以传入成员函数，但必须加&amp; 这里也可以传入仿函数，但是编译器会认为t1是一个函数指针的类型，可以使用{}统一初始化来指出这是一个thread对象 12345678910111213class func &#123;public:    void operator()() &#123; std::cout &lt;&lt; &quot;这是一个仿函数&quot; &lt;&lt; std::endl; &#125;&#125;;int main()&#123;    std::thread t1(func());    std::thread t2&#123;func()&#125;;    t2.join();    std::cout &lt;&lt; typeid(t1).name() &lt;&lt; std::endl;    std::cout &lt;&lt; typeid(t2).name()...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/head.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Jerold</div><div class="author-info-description">这个人很懒，什么也没留下</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/js637a68"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Jerold</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
