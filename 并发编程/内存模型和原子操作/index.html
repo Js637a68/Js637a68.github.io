@@ -1,0 +1,348 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>c++内存模型和原子操作 | Jerold‘s PNote</title><meta name="author" content="Jerold"><meta name="copyright" content="Jerold"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="局部性原理缓存是一个非常常用的工程优化手段，其核心在于提升数据访问的效率。缓存思想基于局部性原理，这个原理包括时间局部性和空间局部性两部分：  时间局部性：指程序在访问某个数据时，通常会在不久的将来再次访问该数据。例如，一个循环结构中，程序会反复访问数组中的某个元素，这就是时间局部性的体现； 空间局部性：指程序在访问某个数据时，通常会访问该数据所在的一段连续内存。例如，一个数组中相邻的元素通常会被">
+<meta property="og:type" content="article">
+<meta property="og:title" content="c++内存模型和原子操作">
+<meta property="og:url" content="http://example.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="Jerold‘s PNote">
+<meta property="og:description" content="局部性原理缓存是一个非常常用的工程优化手段，其核心在于提升数据访问的效率。缓存思想基于局部性原理，这个原理包括时间局部性和空间局部性两部分：  时间局部性：指程序在访问某个数据时，通常会在不久的将来再次访问该数据。例如，一个循环结构中，程序会反复访问数组中的某个元素，这就是时间局部性的体现； 空间局部性：指程序在访问某个数据时，通常会访问该数据所在的一段连续内存。例如，一个数组中相邻的元素通常会被">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/covers/7.jpg">
+<meta property="article:published_time" content="2024-10-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-14T16:00:00.000Z">
+<meta property="article:author" content="Jerold">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/covers/7.jpg"><link rel="shortcut icon" href="/img/logo.jpg"><link rel="canonical" href="http://example.com/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const hour = new Date().getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (theme === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else theme === 'light' ? activateLightMode() : activateDarkMode()
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'c++内存模型和原子操作',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  isShuoshuo: false
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bg2.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/7.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Jerold‘s PNote</span></a><a class="nav-page-title" href="/"><span class="site-name">c++内存模型和原子操作</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">c++内存模型和原子操作</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-10-14T16:00:00.000Z" title="发表于 2024-10-15 2024-10-15T00:00:00+08:00">2024-10-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-10-14T16:00:00.000Z" title="更新于 2024-10-15 2024-10-15T00:00:00+08:00">2024-10-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">并发编程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="局部性原理"><a href="#局部性原理" class="headerlink" title="局部性原理"></a>局部性原理</h2><p>缓存是一个非常常用的工程优化手段，其核心在于提升数据访问的效率。缓存思想基于局部性原理，这个原理包括时间局部性和空间局部性两部分：</p>
+<ol>
+<li><strong>时间局部性</strong>：指程序在访问某个数据时，通常会在不久的将来再次访问该数据。例如，一个循环结构中，程序会反复访问数组中的某个元素，这就是时间局部性的体现；</li>
+<li><strong>空间局部性</strong>：指程序在访问某个数据时，通常会访问该数据所在的一段连续内存。例如，一个数组中相邻的元素通常会被一起访问，这就是空间局部性的体现。</li>
+</ol>
+<h2 id="CPU缓存"><a href="#CPU缓存" class="headerlink" title="CPU缓存"></a>CPU缓存</h2><p>cpu和内存发展的不平衡，速度相差大，在中间引入缓存，每次cpu读取数据时先从缓存读取</p>
+<p>cpu的缓存分为L1（包含L1 I和L1 D，分别存储指令和数据），L2是每个cpu独有的，L3为多个cpu共享</p>
+<img src="./../../pic/缓存/v2-7ad7c8b889f4303d90bd551a20fc8936_1440w.jpg" alt="img" style="zoom:50%;" />
+
+<p>每一个cpu缓存由多个Cache Line缓存行组成，并且主存根据缓存行大小划分为多个主存块，以便对应的主存块直接加载到缓存</p>
+<p>缓存行结构为：| 状态位 | 组标记 |    数据块   |</p>
+<p><strong>状态位</strong>：标记该Cache Line中数据状态，每个缓存数据有<strong>已修改、独占、共享、已失效</strong>四种状态，即MESI</p>
+<p><strong>组标记</strong>：为了区分映射到同一个缓存行中不同的内存块，主存与缓存的地址映射关系分为直接映射，组相联映射和全相联映射</p>
+<p><strong>数据块</strong>：缓存了内存块数据的副本，缓存命中后根据偏移量获取缓存块中对应的字。</p>
+<h2 id="CPU映射"><a href="#CPU映射" class="headerlink" title="CPU映射"></a>CPU映射</h2><p><strong>直接映射：</strong>根据缓存行个数将内存分组，每一个块一一映射，不同组的内存块会映射到同一个缓存行中</p>
+<img src="./../../pic/缓存/image-20250515013756680.png" alt="image-20250515013756680" style="zoom:50%;" />
+
+<p><strong>组相联：</strong></p>
+<ul>
+<li>cache line：常见的缓存行大小有32字节、64字节和128字节</li>
+<li>way：每一个组有几个cache line，8路组相联指一个组有8个cache line</li>
+<li>set：即多少个组，根据cache size &#x2F; n way &#x2F; cache line size计算出多少个组</li>
+</ul>
+<p><strong>第一种情况：</strong></p>
+<p>在大多数教材中，内存地址被分为以下三个字段：</p>
+<p>B &#x3D; 2^b 代表存储单元偏移量</p>
+<p>S &#x3D; 2^s 代表缓存的组数，用来映射内存到缓存是哪一个组</p>
+<p>tag则是缓存的标识，在这个组中比较每一个cache line，如果与某个line一致，并且valid有效，则缓存命中；因此cache miss就有以下几种情况：</p>
+<ol>
+<li>内存数据没有被放到cache</li>
+<li>老数据被新数据替换，导致访问老数据miss</li>
+<li>数据被放到多个cpu的缓存中，其中一个cpu对其修改导致其他cpu的cache line失效</li>
+</ol>
+<img src="./../../pic/缓存/image-20250515014050462.png" alt="image-20250515014050462" style="zoom:50%;" />
+
+<img src="./../../pic/缓存/image-20250515122036901.png" alt="image-20250515122036901" style="zoom:67%;" />
+
+<p><strong>第二种情况：</strong></p>
+<p>像ARM Cortex-A系列，内存地址被分为四个字段;</p>
+<p>Tag：同样表示一个cache line对应一个内存块的索引</p>
+<p>Set：同样表示内存在哪个组中</p>
+<p>区别：offset被细分为Word和Byte字段，这是由于存储单元的基本单位不同；上面以字节为单位，这里以字为单位，一个字刚好是数据总线的大小：4字节&#x3D;&#x3D;32位；Word字段用来表示属于哪个字，而Byte字段表示属于哪个字节</p>
+<p>图中显示的是4路组相映，每个cache line包含8个字，即32个字节；因此一个组大小位128字节，cache总大小位128*256&#x3D;32K</p>
+<img src="./../../pic/缓存/image-20250515123040465.png" alt="image-20250515123040465" style="zoom:50%;" />
+
+<p>内存到cache的映射如下：</p>
+<img src="./../../pic/缓存/image-20250515123958357.png" alt="image-20250515123958357" style="zoom:50%;" />
+
+
+
+<h2 id="缓存一致性"><a href="#缓存一致性" class="headerlink" title="缓存一致性"></a>缓存一致性</h2><ul>
+<li><p><strong>写直达</strong>：CPU每次访问修改数据时，无论数据在不在缓存中，都将修改后的数据写入缓存和内存，缓存数据与内存数据保持<strong>强一致性</strong>，但是每次修改都需要更新两边，这种做法影响写操作的性能。</p>
+</li>
+<li><p><strong>写回</strong>：为了避免每次写操作都要进行数据同步带来的性能损失，写回策略里发生读写操作时：</p>
+<ul>
+<li>如果缓存行中命中了数据，写操作对缓存行中数据进行更新，并标记该缓存行为已修改。</li>
+<li>如果缓存中未命中数据，且数据所对应的缓存行中存放了其他数据：<ul>
+<li><strong>若该缓存行被标记为已修改</strong>，读写操作都会将缓存行中现存的数据<strong>写回</strong>内存中，再将当前要获取的数据从内存读到缓存行，写操作对数据进行更新后标记该缓存行为已修改；</li>
+<li><strong>若该缓存行未被标记为已修改</strong>，读写操作就直接将当前要获取的数据从内存读到缓存行。写操作对数据进行更新后标记该缓存行为已修改。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>写直达是实时同步缓存和内存，而写回策略将数据修改后会等待下一次缓存行置换才能更新到内存，因此修改是不可见的，这期间如果有其他cpu读取内存中的这份数据，就会造成缓存不一致，解决这个问题有两种手段：</p>
+<ul>
+<li>写传播：cpu每次修改数据广播通知其他cpu</li>
+<li>串行化：多个cpu对同一个数据的修改，在其他cpu看来是一致的，比如两个cpu的修改操作为①、②，其他cpu要么都看到①-&gt;②，要么都看到②-&gt;①，不会两种情况都发生</li>
+</ul>
+</blockquote>
+<p><strong>总线嗅探：</strong></p>
+<p>CPU之间是通过总线接收和发送信息的。在这个机制下，CPU需要将每个修改动作都通过总线进行广播，并实时监听总线上的消息，这并不高效。而且总线嗅探无法保证事务的串行化，为了解决上述问题，缓存一致性协议（MESI）产生了。</p>
+<h2 id="MESI一致性协议"><a href="#MESI一致性协议" class="headerlink" title="MESI一致性协议"></a><strong>MESI一致性协议</strong></h2><p>MESI 协议，是一种叫作写失效（Write Invalidate）的协议。在写失效协议里，只有一个 CPU 核心负责写入数据，其他的核心，只是同步读取到这个写入。在这个 CPU 核心写入 cache 之后，它会去广播一个“失效”请求告诉所有其他的 CPU 核心。</p>
+<p>MESI 协议对应的四个不同的标记，分别是：</p>
+<p>M：代表已修改（Modified）</p>
+<p>E：代表独占（Exclusive）</p>
+<p>S：代表共享（Shared）</p>
+<p>I：代表已失效（Invalidated</p>
+<img src="./../../pic/缓存/v2-12eacc7df4f9c10881f9a53d32bdd708_1440w-1747285639742-3.jpg" alt="img" style="zoom: 50%;" />
+
+<h2 id="MESI优化与指令重排"><a href="#MESI优化与指令重排" class="headerlink" title="MESI优化与指令重排"></a>MESI优化与指令重排</h2><p>一个变量在多个CPU中共享时，每次写操作都要先发一个 invalidate 消息广播，再等其他 CPU 将缓存行设置为无效后返回 invalidate ack 才能进行缓存数据修改，这对写操作性能不够友好。于是<strong>为了提高CPU性能，引入了Store buffer和Invalidate Queue。</strong></p>
+<img src="./../../pic/缓存/image-20250515131848948.png" alt="image-20250515131848948" style="zoom: 33%;" />
+
+<h3 id="store-buffer"><a href="#store-buffer" class="headerlink" title="store buffer"></a>store buffer</h3><p>根据MESI协议，每次写操作都要发送invalidate，收到ack后再写入，为了优化写操作性能，在CPU和Cache之间引入了store buffer，写操作时无需立即向其他CPU发送 invalidate 消息，而是先写入store buffer中，然后立刻返回执行其他操作，由 <strong>store buffer 异步执行发送广播消息</strong>，等到接收到其他cpu的响应后再将数据从store buffer移到cache line。</p>
+<p><strong>store Forwarding</strong></p>
+<p>因为有了store buffer机制，有了两份数据备份，因此每次数据查找应该先去找最新的store buffer，再去cache line</p>
+<h3 id="Invalidate-Queue"><a href="#Invalidate-Queue" class="headerlink" title="Invalidate Queue"></a>Invalidate Queue</h3><p>在一个cpu收到invalidate消息时可能处于busy状态，无法及时回复akc，而store buffer又在不断写入最终导致不断堆积最后溢出</p>
+<p>为每个cpu引入一个队列，因此当cpu收到invalidate消息后立马回复ack，然后暂存到这个队列中，后面再去处理消息队列的信息，只只要确保后续在用到这个cache line前处理相关的消息即可。可见<strong>store buffer相当于CPU消息中的发送缓冲区，invalidate queue则相当于接收缓冲区</strong>。</p>
+<h3 id="顺序性与缓存一致性"><a href="#顺序性与缓存一致性" class="headerlink" title="顺序性与缓存一致性"></a>顺序性与缓存一致性</h3><p>从store buffer发送invalidate广播到invalidate queue让缓存行失效前会存在各CPU缓存不一致的现象，使得MESI的强一致性被破坏。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//共享变量</span></span><br><span class="line"><span class="type">int</span> a, b, c = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//CPU1中执行代码</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">CPU1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    a = <span class="number">1</span>;  <span class="comment">//1</span></span><br><span class="line">    b = a;  <span class="comment">//2</span></span><br><span class="line">    c = <span class="number">1</span>;  <span class="comment">//3</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//CPU2中执行代码</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">CPU2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(c == <span class="number">0</span>) <span class="keyword">continue</span>; <span class="comment">//4</span></span><br><span class="line">    <span class="built_in">assert</span>(b == <span class="number">1</span>); <span class="comment">//5</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="指令乱序"><a href="#指令乱序" class="headerlink" title="指令乱序"></a>指令乱序</h4><p>现代CPU中采用多级流水线技术进行指令执行，一条指令的执行过程可被分成4个阶段：<strong>取指令、指令译码、指令执行、数据写回</strong>，CPU一个时钟周期了可以同时执行多条指令的不同阶段，为了使得指令流水线的工作效率更高，期望CPU尽可能的满负荷工作，即一个时钟周期里完成尽可能多的阶段任务，提高指令执行的并行度，为此CPU可能会将指令执行顺序进行重排，同时要避免具有依赖关系的指令被重排，重排前后指令能够保证在单CPU中的执行结果是一致的，但只能保证单CPU下数据的读写以及数据之间的依赖关系，无法保证多CPU下指令重排带来的影响。</p>
+<p>指令重排可能发生在编译器优化阶段或者CPU指令执行阶段，回归到上述代码中，语句1、2存在依赖关系不能够被重排，语句3没有依赖，可能被优化至语句2之前执行，这样就可能导致CPU1、CPU2中语句执行顺序变为1、3、4、5、2，这种执行顺序下”b &#x3D;&#x3D; 1”条件将无法成立。</p>
+<h4 id="store-buffer和invaliadate-queue导致缓存不一致"><a href="#store-buffer和invaliadate-queue导致缓存不一致" class="headerlink" title="store buffer和invaliadate queue导致缓存不一致"></a>store buffer和invaliadate queue导致缓存不一致</h4><p>在MESI协议数据的修改访问需要经过状态的改变，而优化后数据修改直接写入store buffer，store buffer可能会乱序提交，导致c先刷入内存，并且invalidate消息放在队列中异步处理，可能cpu缓存行还没失效就读取了旧数据</p>
+<h2 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h2><p>为解决以上指令重排的问题，引入内存屏障，告诉cpu先执行什么指令，再执行什么指令</p>
+<p><strong>读屏障</strong>：只会约束CPU执行的load指令的顺序，读屏障前的load指令执行完，才会执行读屏障后的load；read memory barrier 用于标记Invalidate Queue</p>
+<p><strong>写屏障</strong>：只会约束CPU执行store指令的顺序，写屏障前的store指令执行完，才会执行写屏障后的store；write memory barrier 用于标记Store Buffer </p>
+<p>全内存屏障会同时约束store和load，<strong>只对调用内存屏障的CPU有效</strong></p>
+<h2 id="内存模型"><a href="#内存模型" class="headerlink" title="内存模型"></a>内存模型</h2><p><strong>对象：</strong>在一个C++程序中的所有数据都是由对象构成。</p>
+<p>“对象”仅仅是对C++数据构建块的一个声明。C++标准定义类对象为“存 储区域”，但对象还是可以将自己的特性赋予其他对象，比如，其类型和生命周期。</p>
+<ol>
+<li>每一个变量都是一个对象，包括作为其成员变量的对象。 </li>
+<li>每个对象至少占有一个内存位置。 </li>
+<li>基本类型都有确定的内存位置(无论类型大小如何，即使他们是相邻的，或是数组的一部分)。 </li>
+<li>相邻位域是相同内存中的一部分。</li>
+</ol>
+<p><strong>修改序列</strong>：由程序中的所有线程对c++的一个对象确定好的修改顺序；在执行过程中，所有线程都必须遵循这个修改顺序。</p>
+<p>如果你使用原子操作，编译器就有责任去替你做必要的同步。这一要求意味着：</p>
+<ol>
+<li>投机执行是不允许的，因为当线程按修改顺序访问一个特殊的输入，之后的读操作，必须由线程返回较新的值，并且之后的写操作必须发生在修改顺序之后。</li>
+<li>同样的，在同一线程上允许读取对象的操作，要不返回一个已写入的值，要不在对象的修改顺序 后(也就是在读取后)再写入另一个值。</li>
+<li>虽然，所有线程都需要遵守程序中每个独立对象的修改 顺序，但它们没有必要遵守在独立对象上的相对操作顺序。</li>
+</ol>
+<h3 id="内存顺序"><a href="#内存顺序" class="headerlink" title="内存顺序"></a>内存顺序</h3><p><strong>内存模型描述了程序中不同线程之间对内存操作的可见性和顺序</strong></p>
+<p>关系术语：</p>
+<ul>
+<li><strong>sequenced-before</strong>：描述了单线程中两个操作的顺序关系，一个线程中若操作A sequenced-before 操作B，则A的修改对B可见</li>
+<li><strong>synchronizes-with</strong>：描述了多线程下两个操作的顺序关系，若线程1的操作A synchronizes-with 线程2的操作B，则A的修改对B可见，常见的利用锁等同步措施能够实现synchronizes-with关系</li>
+<li><strong>happends-before</strong>: 单线程中操作A happends-before 操作B，则A的修改对B可见（A sequenced-before B），在多线程中线程1的操作A happends-before 线程2的操作B，则A的修改对B可见（A synchronizes-with B）</li>
+</ul>
+<p>每种原子操作的函数类型的操作都有一个可选内存排序参数，这<strong>六个</strong>参数可以用来指定所需存储的顺序。 操作分为三类： </p>
+<ol>
+<li><strong>Store</strong>操作，可选如下顺序：memory_order_relaxed、memory_order_release、 memory_order_seq_cst。 </li>
+<li><strong>Load</strong>操作，可选如下顺序：memory_order_relaxed、memory_order_consume、memory_order_acquire,、memory_order_seq_cst。 </li>
+<li><strong>Read-modify-write</strong>(读-改-写)操作，可选如下顺序：memory_order_relaxed、memory_order_consume、 memory_order_acquire、 memory_order_release、 memory_order_acq_rel、 memory_order_seq_cst。</li>
+</ol>
+<p>所有操作的默认顺序都是memory_order_seq_cst。</p>
+<blockquote>
+<p>这六种内存顺序相互组合可以实现三种顺序模型 (ordering model)</p>
+</blockquote>
+<ul>
+<li><p><code>排序一致序列(sequentially consistent)</code> 实现同步, 且保证全局顺序一致 (single total order) 的模型. 是一致性最强的模型, 也是默认的顺序模型. 最消耗性能的模型</p>
+</li>
+<li><p><code>获取-释放序列 (memory_order_consume, memory_order_acquire, memory_order_release和 memory_order_acq_rel)</code> 实现同步, 但不保证保证全局顺序一致的模型. </p>
+</li>
+<li><p><code>自由序列(memory_order_relaxed)</code> 不能实现同步, 只保证原子性的模型.</p>
+</li>
+</ul>
+<h3 id="宽松内存序"><a href="#宽松内存序" class="headerlink" title="宽松内存序"></a>宽松内存序</h3><blockquote>
+<p><strong>std::memory_order_relaxed</strong>具备以下几点：</p>
+</blockquote>
+<ol>
+<li>作用于原子变量 </li>
+<li>对于同一个原子变量，在同一个线程中具有<code>happens-before</code>关系, 在同一线程中不同的原子变量不具有<code>happens-before</code>关系，可以乱序执行。 </li>
+<li>多线程情况下不具有 synchronizes-with 的关系</li>
+</ol>
+<p>在宽松模型中，x，y不具有先后关系，因此在cpu1的store buffer修改数据后可能先把y放回cache和memory导致，y为true，x为false，出现断言</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">std::atomic&lt;<span class="type">bool</span>&gt; x, y;</span><br><span class="line">std::atomic&lt;<span class="type">int</span>&gt; z;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">write_x_then_y</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    x.<span class="built_in">store</span>(<span class="literal">true</span>, std::memory_order_relaxed);  <span class="comment">// 1</span></span><br><span class="line">    y.<span class="built_in">store</span>(<span class="literal">true</span>, std::memory_order_relaxed);  <span class="comment">// 2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">read_y_then_x</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (!y.<span class="built_in">load</span>(std::memory_order_relaxed)) &#123; <span class="comment">// 3</span></span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;y load false&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (x.<span class="built_in">load</span>(std::memory_order_relaxed)) &#123; <span class="comment">//4</span></span><br><span class="line">        ++z;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">TestOrderRelaxed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">t1</span><span class="params">(write_x_then_y)</span></span>;</span><br><span class="line">    <span class="function">std::thread <span class="title">t2</span><span class="params">(read_y_then_x)</span></span>;</span><br><span class="line">    t<span class="number">1.</span><span class="built_in">join</span>();</span><br><span class="line">    t<span class="number">2.</span><span class="built_in">join</span>();</span><br><span class="line">    <span class="built_in">assert</span>(z.<span class="built_in">load</span>() != <span class="number">0</span>); <span class="comment">// 5</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="顺序一致模型"><a href="#顺序一致模型" class="headerlink" title="顺序一致模型"></a>顺序一致模型</h3><ul>
+<li><strong>全局唯一顺序</strong>：所有线程观察到的原子操作必须形成一个<strong>唯一的全局顺序</strong>，且每个线程的内部操作顺序与程序顺序一致。</li>
+<li><strong>禁止重排序</strong>：编译器和处理器不能对标记为 <code>memory_order_seq_cst</code> 的操作进行任何重排序。即</li>
+</ul>
+<p>如下面这段代码看作一份清单，所有线程的这份清单都是一致的，也就说当线程c，d读取时一定是1-&gt;2，或2-&gt;1已经完成，不可能出现c线程读取y&#x3D;false，x&#x3D;&#x3D;true，d线程读取y&#x3D;&#x3D;true，x&#x3D;&#x3D;false的情况</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line">std::atomic&lt;<span class="type">bool</span>&gt; x, y;</span><br><span class="line">std::atomic&lt;<span class="type">int</span>&gt; z;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">write_x</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  x.<span class="built_in">store</span>(<span class="literal">true</span>, std::memory_order_seq_cst);  <span class="comment">// 1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">write_y</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  y.<span class="built_in">store</span>(<span class="literal">true</span>, std::memory_order_seq_cst);  <span class="comment">// 2</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">read_x_then_y</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (!x.<span class="built_in">load</span>(std::memory_order_seq_cst));</span><br><span class="line">  <span class="keyword">if</span> (y.<span class="built_in">load</span>(std::memory_order_seq_cst))  <span class="comment">// 3</span></span><br><span class="line">    ++z;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">read_y_then_x</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (!y.<span class="built_in">load</span>(std::memory_order_seq_cst));</span><br><span class="line">  <span class="keyword">if</span> (x.<span class="built_in">load</span>(std::memory_order_seq_cst))  <span class="comment">// 4</span></span><br><span class="line">    ++z;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  x = <span class="literal">false</span>;</span><br><span class="line">  y = <span class="literal">false</span>;</span><br><span class="line">  z = <span class="number">0</span>;</span><br><span class="line">  <span class="function">std::thread <span class="title">a</span><span class="params">(write_x)</span></span>;</span><br><span class="line">  <span class="function">std::thread <span class="title">b</span><span class="params">(write_y)</span></span>;</span><br><span class="line">  <span class="function">std::thread <span class="title">c</span><span class="params">(read_x_then_y)</span></span>;</span><br><span class="line">  <span class="function">std::thread <span class="title">d</span><span class="params">(read_y_then_x)</span></span>;</span><br><span class="line">  a.<span class="built_in">join</span>();</span><br><span class="line">  b.<span class="built_in">join</span>();</span><br><span class="line">  c.<span class="built_in">join</span>();</span><br><span class="line">  d.<span class="built_in">join</span>();</span><br><span class="line">  <span class="built_in">assert</span>(z.<span class="built_in">load</span>() != <span class="number">0</span>);  <span class="comment">// 5</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Acquire-Release模型"><a href="#Acquire-Release模型" class="headerlink" title="Acquire-Release模型"></a>Acquire-Release模型</h3><p>Acquire-Release模型的强度介于前面两者之间，相较于relax模型限制了指令重排并具有跨线程可见性，同时又不至于像Sequential consistency模型严格限制指令重排，它具有如下特性：</p>
+<ol>
+<li>Acquire-Release模型包含四种内存序，memory_order_release作用于写操作，memory_order_acquire、memory_order_consume作用于读操作，memory_order_acq_rel作用于读写操作</li>
+<li>当前线程memory_order_release写操作之前的任何读写操作都不允许重排到release写操作之后，</li>
+<li>当前线程memory_order_acquire读操作之后的任何读写操作都不允许重排到acquire读之前；</li>
+<li>当前线程对某个原子变量使用了memory_order_consume读（consume基于数据依赖关系而非内存屏障），则后续**依赖于此原子变量（carries a dependency into)**的读和写操作都不能被重排到当前指令前，它相较于acquire更宽松</li>
+<li>若当前线程对某变量使用了memory_order_release写，其他线程对同一变量使用了memory_order_acquire读，则当前线程release写之前的的所有读写操作对其他线程可见。（具有synchronized-with关系）</li>
+<li>若当前线程对某变量使用了memory_order_release写，其他线程对同一变量使用了memory_order_consume读，则当前线程release写之前该变量所依赖的所有读写操作对其他线程可见。</li>
+<li>若当前线程对某变量使用了memory_order_acq_rel，<strong>等同于对原子变量同时使用memory_order_release和memory_order_acquire约束符，操作之前或者之后的内存读写都不被重新排序，</strong>其他线程使用memory_order_release写之前的操作对当前线程都可见，其他线程使用memory_order_consume读，当前线程的acq_rel之前的写操作对其他线程可见。</li>
+</ol>
+<h2 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h2><p>原子性：计算机执行的一条不可分割的指令</p>
+<p>c++标准库提供了原子操作模板**atomic&lt;&gt;<strong>，通过该模板可以实现原子类型操作，例如</strong>atomic&lt;int&gt;**，并且允许用户自定义类型也是原子操作的</p>
+<p><strong>原理：</strong></p>
+<p>所有类型都继承一个静态成员函数<code>is_lock_free()</code>，这个函数允许用户决定是否直接对一个给定类型使用原子指令（x.is_lock_free()返回true），或对编译器和运行库使用内部锁（x.is_lock_free()返回false）。</p>
+<p>只用 <code>std::atomic_flag</code> 类型不提供<code>is_lock_free()</code>成员函数。</p>
+<p>这个类型是一个简单的布尔标志，并且在这种类型上的操作都需要是无锁的(lock-free)；当你有一个简单无锁的布尔标志时，你可以使用其实现一个简单的锁，并且实现其他基础的原子类型。</p>
+<p>类型<code>std::atomic_flag</code>的对象在初始化时清零，随后即可通过成员函数<code>test_and_set()</code>查值并设置成立，或者由<code>clear()</code>清零。整个过程只有这两个操作。</p>
+<p><strong>test_and_set:</strong></p>
+<ol>
+<li><p>如果没被设置过(比如初始状态或者清除后)，将<code>std::atomic_flag</code>当前的状态设置为<code>true</code>，并返回<code>false</code>。</p>
+</li>
+<li><p>如果被设置过则直接返回<code>ture</code>。</p>
+</li>
+</ol>
+<p>对于<code>atomic&lt;&gt;</code>通用类模板，还支持<code>load()</code>和<code>store()</code>、<code>exchange()</code>、<code>compare_exchange_weak()</code>和<code>compare_exchange_strong()</code>等操作，并且这些成员函数操作存在限制：</p>
+<h3 id="atomic-flag"><a href="#atomic-flag" class="headerlink" title="atomic_flag"></a>atomic_flag</h3><p>std::atomic_flag 是最简单的标准原子类型，它表示了一个布尔标志。这个类型的对象在两个状态间切换：设置和清除</p>
+<p>std::atomic_flag 类型的对象必须被<strong>ATOMIC_FLAG_INIT</strong>初始化。初始化标志位是“清除”状态</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::atomic_flag = ATMOIC_FLAG_INIT</span><br></pre></td></tr></table></figure>
+
+<p>这适用于任何对象的声明，并且可在任意范围内。它是唯一需要以如此特殊的方式初始化的 原子类型，但它也是唯一保证无锁的类型</p>
+<p>使用atomic_flag实现自旋锁，选择acquire-release模型，加锁只需保证原子操作，而不需要关心顺序性，因此三种模式都可以；只需要保证解锁操作对其他线程来说是可读的即可，<strong>Unlock操作应当 synchronized-with Lock操作</strong>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">spin_lock</span> &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (flag.<span class="built_in">test_and_set</span>(std::memory_order_acquire)) &#123;</span><br><span class="line">      <span class="comment">// spin</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123; flag.<span class="built_in">clear</span>(std::memory_order_release); &#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">private</span>:</span><br><span class="line">  std::atomic_flag flag = ATOMIC_FLAG_INIT;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="无锁队列实现"><a href="#无锁队列实现" class="headerlink" title="无锁队列实现"></a>无锁队列实现</h2><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><strong><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/642416997">无锁编程——从CPU缓存一致性讲到内存模型</a></strong></p>
+<p><strong><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/6puSfQk3CuCN13BoLp2eUg">谈谈内存屏障的前世今生</a></strong></p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%B9%B6%E5%8F%91/">并发</a></div><div class="post-share"><div class="social-share" data-image="/img/covers/7.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/rbtree/" title="红黑树"><img class="cover" src="/img/covers/6.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">红黑树</div></div><div class="info-2"><div class="info-item-1">Rbtree学习   rbtree的几个原则  （颜色属性）节点非黑即红 （根属性）根节点一定是黑色 （叶子属性）叶子节点（NIL）一定是黑色 （红色属性）每个红色节点的两个子节点，都为黑色。(从每个叶子到根的所有路径上不能有两个连续的红色节点) （黑色属性）从任一节点到其每个叶子的所有路径，都包含相同数目的黑色节点。      rbtree平衡调整的两个手段： 旋转 和 变色 rbtree的平衡调整需要关注两个场景：当父亲节点为红色 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475叔叔节点为红：    即父亲叔叔都为红-》调整为黑，同时爷爷变红    爷爷向上递推调整叔叔节点为黑：    1、LL型失衡：变色、对爷爷左旋或右旋            privot，root颜色取反，旋转        2、LR型失衡：对父亲旋转-》LL型##...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%B9%B6%E5%8F%91future/" title="并发技术future类"><img class="cover" src="/img/covers/13.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">并发技术future类</div></div><div class="info-2"><div class="info-item-1">Future使用搭配async启动一个异步任务，返回一个future对象 1234std::future&lt;int&gt; res = std::async(std::launch::async, []&#123;    std::this_thread::sleep_for(std::chrono::seconds(5));    return 1;&#125;); int i =...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E4%BA%92%E6%96%A5%E5%92%8C%E9%94%81/" title="互斥和锁"><img class="cover" src="/img/covers/6.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-09</div><div class="info-item-2">互斥和锁</div></div><div class="info-2"><div class="info-item-1">互斥c++通过std::mutex实现锁机制，确保多线程下只有一个进入临界区 1234#include &lt;mutex&gt;std::mutex mtx;mtx.lock();mtx.unlock();  当一个函数内需要获取多个锁时，可以采用lock同时加锁，固定加锁的顺序避免死锁 123456789lock(m1, m2);lock_guard&lt;mutex&gt; g1(m1, adopt_lock);lock_guard&lt;mutex&gt; g2(m2, adopt_lock);/*等价于unique_lock&lt;mutex&gt; l1(n1, defer_lock);unique_lock&lt;mutex&gt; l2(n2, defer_lock);lock(m1,m2)*///或者等价于 scoped_lock s1(m1,m2);    层级锁自定义锁添加权重来保证每次加锁顺序和解锁顺序，数值越大权重越高，核心static thread_local unsigned...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/c++%E7%BA%BF%E7%A8%8B/" title="C++线程与源码学习"><img class="cover" src="/img/covers/6.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-08</div><div class="info-item-2">C++线程与源码学习</div></div><div class="info-2"><div class="info-item-1">C++线程std::thread创建thread封装线程操作，通过std::tread(func)传入函数指针，创建一个对象并初始化即开启一个线程执行 注意： 这里可以传入成员函数，但必须加&amp; 这里也可以传入仿函数，但是编译器会认为t1是一个函数指针的类型，可以使用{}统一初始化来指出这是一个thread对象 12345678910111213class func &#123;public:    void operator()() &#123; std::cout &lt;&lt; &quot;这是一个仿函数&quot; &lt;&lt; std::endl; &#125;&#125;;int main()&#123;    std::thread t1(func());    std::thread t2&#123;func()&#125;;    t2.join();    std::cout &lt;&lt; typeid(t1).name() &lt;&lt; std::endl;    std::cout &lt;&lt; typeid(t2).name()...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%B9%B6%E5%8F%91future/" title="并发技术future类"><img class="cover" src="/img/covers/13.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-13</div><div class="info-item-2">并发技术future类</div></div><div class="info-2"><div class="info-item-1">Future使用搭配async启动一个异步任务，返回一个future对象 1234std::future&lt;int&gt; res = std::async(std::launch::async, []&#123;    std::this_thread::sleep_for(std::chrono::seconds(5));    return 1;&#125;); int i =...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97%E5%8F%8A%E4%B8%A4%E7%A7%8D%E5%B9%B6%E8%A1%8C%E8%AE%BE%E8%AE%A1/" title="并行计算及两种并发模型"><img class="cover" src="/img/covers/5.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-11</div><div class="info-item-2">并行计算及两种并发模型</div></div><div class="info-2"><div class="info-item-1">并行计算利用cpu多核计算子集，然后合并返回结果；例如在快排中，本身计算privot左边，交给子线程计算privot右边 倘若我们要实现一套通用的规则而不依赖于存储容器，那就可以使用函数式编程 函数式编程：程序由一系列函数组成，每一步计算就是函数求值，并且不改变状态和数据（那样拷贝数据返回新值挺费内存吧） 12345678910111213141516171819202122232425template&lt;class T&gt;std::list&lt;T&gt; parallel_quick_sort(std::list&lt;T&gt; input) &#123;	if(input.empty()) return input;    std::list&lt;T&gt; result;    // 转移，前插    result.splice(result.begin(), input, input.begin());    T const&amp; pivot = *result.begin();    基于privot拆分链表    auto...</div></div></div></a><a class="pagination-related" href="/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/" title="条件变量实现安全队列和信号量"><img class="cover" src="/img/covers/9.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-12</div><div class="info-item-2">条件变量实现安全队列和信号量</div></div><div class="info-2"><div class="info-item-1">条件变量实现安全队列一些源码的解释 12#include &lt;condition_variable&gt;std::codition_variable cv;  &#x2F;&#x2F; wake up one waiter 1void notify_one() noexcept  &#x2F;&#x2F; wake up all waiters 1void notify_all() noexcept   Nothing to do to comply with LWG-2135 because std::mutex lock&#x2F;unlock are nothrow 1void wait(unique_lock&lt;mutex&gt;&amp; _Lck) &#x2F;&#x2F; wait for signal and test predicate 123456template &lt;class _Predicate&gt;void wait(unique_lock&lt;mutex&gt;&amp; _Lck, _Predicate _Pred)...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B1%80%E9%83%A8%E6%80%A7%E5%8E%9F%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">局部性原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU%E7%BC%93%E5%AD%98"><span class="toc-number">2.</span> <span class="toc-text">CPU缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU%E6%98%A0%E5%B0%84"><span class="toc-number">3.</span> <span class="toc-text">CPU映射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7"><span class="toc-number">4.</span> <span class="toc-text">缓存一致性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MESI%E4%B8%80%E8%87%B4%E6%80%A7%E5%8D%8F%E8%AE%AE"><span class="toc-number">5.</span> <span class="toc-text">MESI一致性协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MESI%E4%BC%98%E5%8C%96%E4%B8%8E%E6%8C%87%E4%BB%A4%E9%87%8D%E6%8E%92"><span class="toc-number">6.</span> <span class="toc-text">MESI优化与指令重排</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#store-buffer"><span class="toc-number">6.1.</span> <span class="toc-text">store buffer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Invalidate-Queue"><span class="toc-number">6.2.</span> <span class="toc-text">Invalidate Queue</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%BA%E5%BA%8F%E6%80%A7%E4%B8%8E%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7"><span class="toc-number">6.3.</span> <span class="toc-text">顺序性与缓存一致性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E4%B9%B1%E5%BA%8F"><span class="toc-number">6.3.1.</span> <span class="toc-text">指令乱序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#store-buffer%E5%92%8Cinvaliadate-queue%E5%AF%BC%E8%87%B4%E7%BC%93%E5%AD%98%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="toc-number">6.3.2.</span> <span class="toc-text">store buffer和invaliadate queue导致缓存不一致</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C"><span class="toc-number">7.</span> <span class="toc-text">内存屏障</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B"><span class="toc-number">8.</span> <span class="toc-text">内存模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E9%A1%BA%E5%BA%8F"><span class="toc-number">8.1.</span> <span class="toc-text">内存顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%BD%E6%9D%BE%E5%86%85%E5%AD%98%E5%BA%8F"><span class="toc-number">8.2.</span> <span class="toc-text">宽松内存序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%BA%E5%BA%8F%E4%B8%80%E8%87%B4%E6%A8%A1%E5%9E%8B"><span class="toc-number">8.3.</span> <span class="toc-text">顺序一致模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Acquire-Release%E6%A8%A1%E5%9E%8B"><span class="toc-number">8.4.</span> <span class="toc-text">Acquire-Release模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C"><span class="toc-number">9.</span> <span class="toc-text">原子操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#atomic-flag"><span class="toc-number">9.1.</span> <span class="toc-text">atomic_flag</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A0%E9%94%81%E9%98%9F%E5%88%97%E5%AE%9E%E7%8E%B0"><span class="toc-number">10.</span> <span class="toc-text">无锁队列实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">11.</span> <span class="toc-text">参考资料</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Jerold</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

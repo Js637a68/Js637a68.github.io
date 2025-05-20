@@ -1,0 +1,611 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>面试题 | Jerold‘s PNote</title><meta name="author" content="Jerold"><meta name="copyright" content="Jerold"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="c++#define与inline区别：   特性 #define（宏） inline（内联函数）    处理阶段 预处理阶段（文本替换） 编译阶段（编译器决策）   类型检查 无类型检查，直接文本替换 有类型检查，遵循函数参数规则   作用域 全局（从定义处开始生效直到#undef） 遵循作用域规则（类内、命名空间等）   调试支持 替换后代码难以调试 可生成调试符号（即使内联失败）   安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面试题">
+<meta property="og:url" content="http://example.com/%E9%9D%A2%E8%AF%95%E9%A2%98/index.html">
+<meta property="og:site_name" content="Jerold‘s PNote">
+<meta property="og:description" content="c++#define与inline区别：   特性 #define（宏） inline（内联函数）    处理阶段 预处理阶段（文本替换） 编译阶段（编译器决策）   类型检查 无类型检查，直接文本替换 有类型检查，遵循函数参数规则   作用域 全局（从定义处开始生效直到#undef） 遵循作用域规则（类内、命名空间等）   调试支持 替换后代码难以调试 可生成调试符号（即使内联失败）   安全">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/covers/5.jpg">
+<meta property="article:published_time" content="2025-05-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-05-18T16:00:00.000Z">
+<meta property="article:author" content="Jerold">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/covers/5.jpg"><link rel="shortcut icon" href="/img/logo.jpg"><link rel="canonical" href="http://example.com/%E9%9D%A2%E8%AF%95%E9%A2%98/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const hour = new Date().getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (theme === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else theme === 'light' ? activateLightMode() : activateDarkMode()
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '面试题',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  isShuoshuo: false
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bg2.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/5.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Jerold‘s PNote</span></a><a class="nav-page-title" href="/"><span class="site-name">面试题</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">面试题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-05-18T16:00:00.000Z" title="发表于 2025-05-19 2025-05-19T00:00:00+08:00">2025-05-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-05-18T16:00:00.000Z" title="更新于 2025-05-19 2025-05-19T00:00:00+08:00">2025-05-19</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><hr>
+<h2 id="c"><a href="#c" class="headerlink" title="c++"></a>c++</h2><h4 id="define与inline区别："><a href="#define与inline区别：" class="headerlink" title="#define与inline区别："></a>#define与inline区别：</h4><table>
+<thead>
+<tr>
+<th align="left"><strong>特性</strong></th>
+<th align="left"><strong><code>#define</code>（宏）</strong></th>
+<th align="left"><strong><code>inline</code>（内联函数）</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>处理阶段</strong></td>
+<td align="left">预处理阶段（文本替换）</td>
+<td align="left">编译阶段（编译器决策）</td>
+</tr>
+<tr>
+<td align="left"><strong>类型检查</strong></td>
+<td align="left">无类型检查，直接文本替换</td>
+<td align="left">有类型检查，遵循函数参数规则</td>
+</tr>
+<tr>
+<td align="left"><strong>作用域</strong></td>
+<td align="left">全局（从定义处开始生效直到#undef）</td>
+<td align="left">遵循作用域规则（类内、命名空间等）</td>
+</tr>
+<tr>
+<td align="left"><strong>调试支持</strong></td>
+<td align="left">替换后代码难以调试</td>
+<td align="left">可生成调试符号（即使内联失败）</td>
+</tr>
+<tr>
+<td align="left"><strong>安全性</strong></td>
+<td align="left">易因运算符优先级或副作用导致错误</td>
+<td align="left">行为与普通函数一致，更安全</td>
+</tr>
+</tbody></table>
+<h4 id="auto"><a href="#auto" class="headerlink" title="auto"></a>auto</h4><p>auto类型推导通常与模板类型推导相同，但是auto可以推导{}是初始值列表</p>
+<p>auto必须初始化，不然编译错误</p>
+<p>auto可以使用尾随返回类型，省略类中枚举类型的作用域</p>
+<p>auto推导两个bool相加为int，对bool类型提升了</p>
+<h4 id="decltype"><a href="#decltype" class="headerlink" title="decltype"></a>decltype</h4><p><code>decltype</code>是一个关键字，用于查询变量或表达式的类型。具体应用与函数模板中推导复杂的返回类型，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename Func, typename... Args&gt;</span><br><span class="line">auto submit(Func&amp;&amp; f, Args&amp;&amp;... args)-&gt;decltype(Func(args...))&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>c++14后可以将上面尾随返回类型替换成decltype(auto)用来推导return返回的类型</p>
+<h4 id="内存分区"><a href="#内存分区" class="headerlink" title="内存分区"></a>内存分区</h4><p>在C++中，内存主要分为以下五个分区，每个分区负责管理不同类型的数据，具有不同的生命周期和访问</p>
+<table>
+<thead>
+<tr>
+<th align="left">分区</th>
+<th align="left">分配方式</th>
+<th align="left">生命周期</th>
+<th align="left">管理权限</th>
+<th align="left">典型数据</th>
+<th>补充</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>栈</strong></td>
+<td align="left">自动</td>
+<td align="left">函数作用域</td>
+<td align="left">编译器</td>
+<td align="left">局部变量、参数</td>
+<td>1.自动分配和释放效率高；2.内存容量有限（默认约几MB），过度使用可能导致<strong>栈溢出</strong>（如递归过深）。</td>
+</tr>
+<tr>
+<td align="left"><strong>堆</strong></td>
+<td align="left">手动</td>
+<td align="left">直到显式释放</td>
+<td align="left">程序员</td>
+<td align="left"><code>new</code>&#x2F;<code>malloc</code>申请的内存</td>
+<td>容量大（受系统虚拟内存限制），但管理不当会导致<strong>内存泄漏</strong>或<strong>碎片化</strong>。</td>
+</tr>
+<tr>
+<td align="left"><strong>全局&#x2F;静态</strong></td>
+<td align="left">程序启动时</td>
+<td align="left">整个程序运行期</td>
+<td align="left">编译器&#x2F;系统</td>
+<td align="left">全局变量、<code>static</code>变量</td>
+<td><strong>.data段</strong>：已初始化的全局&#x2F;静态变量。 <strong>.bss段</strong>：未初始化的全局&#x2F;静态变量（默认初始化为0）</td>
+</tr>
+<tr>
+<td align="left"><strong>常量区</strong></td>
+<td align="left">编译时初始化</td>
+<td align="left">程序运行期</td>
+<td align="left">只读</td>
+<td align="left">字符串常量、<code>const</code>全局变量</td>
+<td>只读，修改会导致段错误（如尝试修改字符串常量）</td>
+</tr>
+<tr>
+<td align="left"><strong>代码区</strong></td>
+<td align="left">编译时</td>
+<td align="left">程序运行期</td>
+<td align="left">只读</td>
+<td align="left">函数代码、指令</td>
+<td>只读，防止程序被意外修改。 可能被多个进程共享（如动态库代码）。</td>
+</tr>
+</tbody></table>
+<h4 id="static"><a href="#static" class="headerlink" title="static"></a>static</h4><p>1、静态成员变量</p>
+<p>static静态成员不属于类实例，在.data&#x2F;.bss分配内存，在程序的生命周期内仅分配一次，所有对象共享一份；因此，在类中只有声明，必须在类外部的全局作用域中显式定义静态成员。</p>
+<p>2、静态成员函数：</p>
+<table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left">成员函数</th>
+<th align="left">静态成员函数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>调用方式</strong></td>
+<td align="left">需通过对象调用（<code>obj.func()</code>）</td>
+<td align="left">可直接通过类名调用（<code>MyClass::func()</code>）</td>
+</tr>
+<tr>
+<td align="left"><strong><code>this</code>指针</strong></td>
+<td align="left">有（隐式传递对象地址）</td>
+<td align="left">无</td>
+</tr>
+<tr>
+<td align="left"><strong>访问权限</strong></td>
+<td align="left">可访问非静态和静态成员</td>
+<td align="left">仅能访问静态成员</td>
+</tr>
+<tr>
+<td align="left"><strong>用途</strong></td>
+<td align="left">操作对象的具体状态</td>
+<td align="left">执行与类相关的通用操作</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">静态成员不能是虚函数，const</td>
+</tr>
+</tbody></table>
+<p>3、静态初始化顺序：</p>
+<p>在不同单元.cpp中，全局静态变量初始化顺序是随机，倘若A依赖与B，A初始化时可能B没初始化，获取不到B内容</p>
+<p>解决：可以将B放在函数中变成静态局部变量，被调用时即初始化</p>
+<h4 id="重载，重写，覆盖区别"><a href="#重载，重写，覆盖区别" class="headerlink" title="重载，重写，覆盖区别"></a>重载，重写，覆盖区别</h4><p>当有两个函数名称相同、返回类型相同，但参数数量或类型，或者限定符不同时，就构成了函数重载。</p>
+<p>基类有virtual修改函数，子类重新实现这个虚函数即重写，只能函数类容不一致，可以通过<strong>override</strong>说明符确保没有错误地重写基类函数。</p>
+<p>在子类重新定义一个同名的函数，函数名相同，其他都可以不同，这样即覆盖</p>
+<h4 id="虚函数"><a href="#虚函数" class="headerlink" title="虚函数"></a>虚函数</h4><p>子类重写基类的virtual修饰的函数，用实现多态，返回类型，函数名，函数参数类型以及个数必须都一致，不然变成覆盖了</p>
+<p>对象的前4个或8个是一个vptr，指向vtable，每个类中有一张虚表，虚表存放着每一个虚函数指向的函数指针，当基类指针指向派生类时，vptr指向派生类的虚表，调用虚函数时就去虚表寻找真正绑定的函数指针，这个过程叫做动态绑定。</p>
+<p>1、将基类析构函数声明为虚函数可确保派生类对象被正确析构，即基类和派生类的析构函数都会被调用</p>
+<p>2、构造函数不能为虚函数：子类构造时先构造基类，这时候子类对象未实例化，根本无法动态绑定</p>
+<h4 id="协变返回类型"><a href="#协变返回类型" class="headerlink" title="协变返回类型"></a>协变返回类型</h4><p>是工厂模式的重要概念，表现为：produce函数返回基类指针，指向new分配的子类对象</p>
+<h4 id="虚继承"><a href="#虚继承" class="headerlink" title="虚继承"></a>虚继承</h4><p>虚继承是一种C++技术，它确保孙子派生类仅继承基类成员变量的一份副本。用来解决菱形继承问题</p>
+<p>当虚继承时会生成一个vbptr虚基表指针，指针指向虚基表，虚基表存放基类的偏移量，通过这个机制来保证只有一份基类成员变量</p>
+<p>虚继承的顺序必须正确才有效，即当前D类继承两个类B，C发生了领先继承问题时，才让B，C类虚继承A类</p>
+<p>D类对象的内存布局是这样的：{ B{ vbptr, b }, C{ vbptr, c} d, A{ a } }</p>
+<h4 id="私有继承"><a href="#私有继承" class="headerlink" title="私有继承"></a>私有继承</h4><p>继承的访问说明符不会影响实现的继承。实现总是基于函数的访问级别进行继承。继承的访问说明符仅影响类接口的可访问性。</p>
+<p>继承用于表达 “是一个（is - a）” 的关系，私有继承将这种关系变为”用来父类实现（is-implemented-in-terms-of）” 关系。</p>
+<p>表现为：子类私有继承父类后，父类的所有成员变量和函数变为私有，只能通过子类实现接口调用父类的成员，父类和子类没有公开继承关系，无法将派生类指针隐式转换为基类指针</p>
+<h4 id="delete说明符"><a href="#delete说明符" class="headerlink" title="&#x3D;delete说明符"></a>&#x3D;delete说明符</h4><p>从C++11开始，我们可以使用<code>delete</code>说明符来限制某些类型的拷贝、移动，实际上甚至可以限制其多态使用。 但是<code>= delete</code>的用途不止于此。它可以应用于任何函数，无论是成员函数还是自由函数。 例如，我不想要add函数接收double类型的参数，可以使用delete删除重载的版本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">double add(double, double) = delete;</span><br></pre></td></tr></table></figure>
+
+<h4 id="lambda"><a href="#lambda" class="headerlink" title="lambda"></a>lambda</h4><p>立即调用lambda函数，通过这种方式，你可以对<code>const</code>变量进行复杂的初始化</p>
+<p>捕获：<code>auto  l = [&amp;args...] &#123; return  g(args...);&#125;;</code></p>
+<h4 id="模板变参"><a href="#模板变参" class="headerlink" title="模板变参"></a>模板变参</h4><p>c语言支持函数变参，通过va_list, va_start, va_arg, va_end系列函数获取参数，但是函数并不知道到参数的具体类型，va_arg获取参数的原理是按照类型去通过指针去参数列表取得的，只适合用于POD类型</p>
+<p>c++实现了变参模板，即同时传递变量和类型；模板参数包和函数参数包可以将多个参数打包看作一个参数，然后在模板推导时通过<strong>包扩展</strong>将其解包。…在变量前则声明参数包，在变量后则进行参数解包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename ...Arg&gt;</span><br><span class="line">void func(Arg... args) &#123;args...;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如何才能利用模板参数包及包扩展,使得模板能够接受任意多 的模板参数,且均能实例化出有效的对象呢?</p>
+<p>通过递归的方法，参套包含，并且指定边界条件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename... T&gt; class tuple;</span><br><span class="line">template&lt;typename Head, typename... Tail&gt; class tuple&lt;Head, Tail...&gt; : private tuple&lt;Tail...&gt; &#123; Head head; &#125;;</span><br><span class="line">template&lt;&gt;class tuple&lt;&gt; &#123;&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="聚合初始化"><a href="#聚合初始化" class="headerlink" title="聚合初始化"></a>聚合初始化</h4><p>使用初始值列表 {} 进行初始化有三个好处：</p>
+<ol>
+<li>不会出现解析问题，因为c++中任何能被解释为声明的内容，都会被解释为声明。Myclass a()则会被视为函数声明</li>
+<li>当出现窄化转换时，编译错误</li>
+<li>直接初始化容器，不再需要一个一个插入</li>
+</ol>
+<h4 id="用户定义字面量"><a href="#用户定义字面量" class="headerlink" title="用户定义字面量"></a>用户定义字面量</h4><p>用户定义字面量允许通过定义用户定义的后缀，让整数、浮点数、字符和字符串字面量生成用户定义类型的对象。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">constexpr</span> <span class="type">int</span> <span class="keyword">operator</span><span class="string">&quot;&quot;</span> _pow(<span class="type">int</span> x) &#123; <span class="keyword">return</span> x*x; &#125;</span><br><span class="line">cout &lt;&lt; <span class="number">5</span>_pow;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>用户定义字面量可用于整数、浮点数、字符和字符串类型的转换。</p>
+</li>
+<li><p>用户定义字面量可用于辅助强类型，例如相比于直接传数值给构造函数，可以像数值转换成对应的对象指标</p>
+</li>
+</ol>
+<h4 id="类型别名"><a href="#类型别名" class="headerlink" title="类型别名"></a>类型别名</h4><p>使用using代替typedef的好处：</p>
+<ol>
+<li>在函数指针的情况下，别名声明的可读性更强：</li>
+<li><code>typedef</code>不支持模板化，而别名声明支持。</li>
+</ol>
+<h4 id="RAII"><a href="#RAII" class="headerlink" title="RAII"></a>RAII</h4><p>资源获取即初始化，这里所说的资源包括：</p>
+<ul>
+<li>分配的堆内存；</li>
+<li>执行线程；</li>
+<li>打开的套接字；</li>
+<li>文件；</li>
+<li>锁定的互斥锁；</li>
+<li>磁盘空间；</li>
+<li>数据库连接。</li>
+</ul>
+<p>但RAII不仅关乎资源获取，还涉及资源释放。RAII还确保在控制对象的生命周期结束时，所有资源都会以获取的相反顺序被释放。同样，当一个对象的资源获取失败时，该对象或其任何成员已经成功获取的所有资源都必须以相反顺序释放。</p>
+<p>另一方面，如果你考虑原始指针，它们并不遵循RAII概念。当一个指针超出作用域时，它不会自动被销毁，你必须在它丢失并造成内存泄漏之前手动删除它。而标准库中的智能指针（<code>std::unique_ptr</code>、<code>std::shared_ptr</code>）提供了这样一种封装机制。</p>
+<h4 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h4><p><strong>unique_ptr：</strong>独享对象所有权的智能指针，禁用拷贝构造和赋值函数，但可以通过右值引用进行拷贝，原来的对象指针变为nullptr</p>
+<p>默认情况下，你应该选择<code>std::unique_ptr</code>。它是一种小巧、快速且仅支持移动操作的智能指针，用于管理具有独占所有权语义的资源。</p>
+<p>C++14引入了<code>std::make_unique</code>来简化创建过程，新的指针创建方式更安全，防止将同一个原始指针传递给两个新的<code>unique_ptr</code></p>
+<p><strong>shared_ptr：</strong>共享对象所有权的智能指针，通过过share_count计数实现拷贝，当析构时计数为0才真正删除所指内存</p>
+<p>与<code>std::unique_ptr</code>或原始指针相比，<code>std::shared_ptr</code>对象通常要大两倍，因为它们不仅包含一个原始指针，还包含另一个指向动态分配内存区域的原始指针，在这个区域进行引用计数。</p>
+<p>通过<code>std::make_shared</code>，更加安全，因为这样可以避免意外地传入同一个原始指针两次，而且还能避免为引用计数内存进行动态分配的开销。避免从原始指针类型的变量创建<code>std::shared_ptr</code>，因为这样难以维护，也很难判断所指向的对象何时会被销毁。</p>
+<p>使用<code>std::shared_ptr</code>进行共享所有权的资源管理。</p>
+<p><strong>weak_ptr</strong>：share_ptr的弱引用，使用时必须转换为share_ptr，<strong>解决环状引用</strong></p>
+<blockquote>
+<p>环状引用：当a析构时A的计数为1，b析构时B的计数为1，造成内存泄漏</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">class B;</span><br><span class="line">class A&#123;</span><br><span class="line">public:</span><br><span class="line">	shared_ptr&lt;B&gt; pb;</span><br><span class="line">&#125;;</span><br><span class="line">class B&#123;</span><br><span class="line">public:</span><br><span class="line">	shared_ptr&lt;A&gt; pa;</span><br><span class="line">&#125;</span><br><span class="line">shared_ptr&lt;A&gt; a(new A);</span><br><span class="line">shared_ptr&lt;B&gt; b(new B);</span><br><span class="line">a-&gt;pb = b;</span><br><span class="line">b-&gt;pa = a;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>弱指针<code>std::weak_ptr</code>是一种智能指针，它不会影响对象的引用计数，因此它所指向的对象可能已经被销毁。</p>
+<p>如果使用共享指针，它们之间会形成循环依赖，导致无法被销毁，进而产生资源泄漏。weak_ptr解决这种情况。</p>
+<p>它在缓存和观察者模式中也很有用。</p>
+<p><strong>std::enable_shared_from_this</strong></p>
+<p>在类中返回包裹当前对象（this）的一个<strong>std::shared_ptr</strong>对象给外部使用</p>
+<p>陷阱一：不应该共享栈对象的 this 给智能指针对象，智能指针管理的是堆对象</p>
+<p>陷阱二：避免std::enable_shared_from_this的循环引用问题</p>
+<p><strong>new和make_share和make_unique比较</strong></p>
+<p>与直接使用<code>new</code>相比，<code>make</code>函数消除了源代码的重复，提高了异常安全性，并且<code>std::make_shared</code>生成的代码更简洁、运行速度更快。</p>
+<ol>
+<li><p>当使用<code>new</code>时，如果在构造过程中抛出异常，在某些情况下可能会导致资源泄漏，因为此时指针还没有被<code>make</code>函数“处理”。</p>
+</li>
+<li><p><code>std::make_shared</code>也比直接使用<code>new</code>更快，因为它只分配一次内存来存储对象和用于引用计数的控制块。而使用<code>new</code>则需要进行两次内存分配（即分配对象又要分配智能指针）。</p>
+</li>
+<li><p>make函数避免创建两份智能指针内存指向同一个原始指针，不仅更加安全还减少内存分配</p>
+</li>
+</ol>
+<blockquote>
+<p>share_ptr和weak_ptr实现原理：shared_ptr封装了原生指针和一个计数块cblock，可以看到share_ptr通过shared_count计数，并且析构后如果还有weak_ptr在观察，则不会释放cblock；而weak_ptr想要使用必须通过lock转换share_ptr并且在data_指针存在时才能转换</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">cblock</span> &#123;</span><br><span class="line">    <span class="type">int</span> shared_count = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> weak_count = <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">shared_ptr</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="built_in">shared_ptr</span>(<span class="type">const</span> shared_ptr&amp; sp) <span class="keyword">noexcept</span> </span><br><span class="line">    ...</span><br><span class="line">        <span class="keyword">if</span> (cblock_) ++cblock_-&gt;shared_count;</span><br><span class="line">    ...</span><br><span class="line">    ~<span class="built_in">shared_ptr</span>() &#123;</span><br><span class="line">        <span class="built_in">dec_shared_count</span>();</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">dec_shared_count</span><span class="params">()</span> <span class="keyword">noexcept</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (cblock_) &#123;</span><br><span class="line">            <span class="keyword">if</span> (--cblock_-&gt;shared_count &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">delete</span> data_;</span><br><span class="line">                data_ = <span class="literal">nullptr</span>;</span><br><span class="line">                <span class="keyword">if</span> (cblock_-&gt;weak_count &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">delete</span> cblock_;</span><br><span class="line">                    cblock_ = <span class="literal">nullptr</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    T* data_ = <span class="literal">nullptr</span>;</span><br><span class="line">    cblock* cblock_ = <span class="literal">nullptr</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="左值、右值："><a href="#左值、右值：" class="headerlink" title="左值、右值："></a>左值、右值：</h4><p>c++表达式有两个特性：</p>
+<ol>
+<li>has identity? —— 是否有唯一标识，比如地址、指针。有唯一标识的表达式在 C++ 中被称为 glvalue（generalized lvalue）。</li>
+<li>can be moved from? —— 是否可以安全地移动（编译器）。可以安全地移动的表达式在 C++ 中被成为 rvalue。</li>
+</ol>
+<p>根据这两个特性，可以将表达式分成 4 类：</p>
+<ol>
+<li>has identity and cannot be moved from - 这类表达式在 C++ 中被称为 lvalue。左值</li>
+<li>has identity and can be moved from - 这类表达式在 C++ 中被成为 <a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=121474538&content_type=Article&match_order=1&q=xvalue&zhida_source=entity">xvalue</a>（expiring value）。将亡值</li>
+<li>does not have identity and can be moved from - 这类表达式在 C++ 中被成为 <a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=121474538&content_type=Article&match_order=1&q=prvalue&zhida_source=entity">prvalue</a>（pure rvalue）。纯右值</li>
+<li>does not have identity and cannot be moved -C++ 中不存在这类表达式。</li>
+</ol>
+<h4 id="右值引用，引用折叠，完美转发"><a href="#右值引用，引用折叠，完美转发" class="headerlink" title="右值引用，引用折叠，完美转发"></a>右值引用，引用折叠，完美转发</h4><p>右值引用可以直接移动给左值对象，而不需要进行开销较大的深拷贝（deep copy）。</p>
+<p>移动语义通过<code>std::move</code>实现，它返回一个右值引用，而右值引用是移动操作的候选对象</p>
+<p>c++类增加了移动构造函数和移动赋值操作符来实现对象转移，当一个函数返回一个对象时编译器会优先寻找移动构造函数，再去寻找拷贝构造函数</p>
+<p>如果函数模板参数的类型为<code>T&amp;&amp;</code>（<code>T</code>为推导类型），或者对象使用<code>auto&amp;&amp;</code>声明，那么这个参数或对象就是一个<strong>万能引用</strong>。当传入类型时发生<strong>引用折叠</strong>：只有&amp;&amp; &amp;&amp;才会折叠成右值引用</p>
+<p><strong>完美转发</strong>使函数参数保持原来的类型，因为当形参为右值引用，传入实参后，在函数中就有了标识，变成了左值，失去了原本右值引用的类型</p>
+<h4 id="constexpr"><a href="#constexpr" class="headerlink" title="constexpr"></a>constexpr</h4><p>constexpr修饰的表达式一定是常量表达式，并且在编译时期求值</p>
+<p><code>constexpr</code>函数总是线程安全的，并且会被内联（inlined）。</p>
+<h4 id="noexcept"><a href="#noexcept" class="headerlink" title="noexcept"></a>noexcept</h4><p>六个生成的特殊函数是隐式的<code>noexcept</code>函数。</p>
+<p>如果在函数声明了<code>noexcept</code>的情况下仍然抛出异常，就会调用<code>std::terminate</code>。</p>
+<p>正如C++核心准则所指出的，当程序崩溃比实际处理异常更好时，你可以使用<code>noexcept</code>。</p>
+<h4 id="struct和class区别"><a href="#struct和class区别" class="headerlink" title="struct和class区别"></a>struct和class区别</h4><p>在C++中，类和结构体之间的区别很小，表现为：结构体中成员变量和方法的默认访问权限是公共（public）的，而类中是私有（private）的</p>
+<p>C语言中，结构体不支持函数（或方法）。</p>
+<h4 id="string-view"><a href="#string-view" class="headerlink" title="string_view"></a>string_view</h4><p>c++17引入新目标，在处理大型字符串时避免不必要的复制。典型的实现需要两个信息：指向字符序列的指针和字符序列的长度。字符序列可以是C++字符串，也可以是C风格字符串。</p>
+<p>view一词说明其不包含字符串的管理权，相当引用，string则拥有内存。</p>
+<p>主要用于访问和比较字符串内容。</p>
+<p>不过，它有一个缺点。由于在底层，你可能使用<code>std::string</code>或<code>std::string_view</code>，这样就失去了隐式的空字符终止。如果你需要这个特性，就必须继续使用<code>std::string (const&amp;)</code>。</p>
+<h4 id="pimpl"><a href="#pimpl" class="headerlink" title="pimpl"></a>pimpl</h4><p>即<strong>Pointer to Implementation</strong>（也有人认为是<strong>Private Implementation</strong>）：将类中敏感的成员变量和成员函数封装到类中定义的impl类里或结构中，只留下一个指向impl的指针pimpl</p>
+<p>这个方法的优点：</p>
+<ul>
+<li><p>核心数据成员被隐藏；</p>
+<p>核心数据成员被隐藏，不必暴露在头文件中，对使用者透明，提高了安全性。</p>
+</li>
+<li><p>降低编译依赖，提高编译速度；</p>
+<p>由于原来的头文件的一些私有成员变量可能是非指针非引用类型的自定义类型，需要在当前类的头文件中包含这些类型的头文件，使用了<strong>pimpl</strong>惯用法以后，这些私有成员变量被移动到当前类的cpp文件中，因此头文件不再需要包含这些成员变量的类型头文件，当前头文件变“干净”，这样其他文件在引用这个头文件时，依赖的类型变少，加快了编译速度。</p>
+</li>
+<li><p>接口与实现分离。</p>
+<p>使用了<strong>pimpl</strong>惯用法之后，即使<strong>CSocketClient</strong>或者<strong>Impl</strong>类的实现细节发生了变化，对使用者都是透明的，对外的<strong>CSocketClient</strong>类声明仍然可以保持不变。例如我们可以增删改Impl的成员变量和成员方法而保持<strong>SocketClient.h</strong>文件内容不变；如果不使用<strong>pimpl</strong>惯用法，我们做不到不改变<strong>SocketClient.h</strong>文件而增删改<strong>CSocketClient</strong>类的成员。</p>
+</li>
+</ul>
+<h4 id="C-注解标签"><a href="#C-注解标签" class="headerlink" title="C++注解标签"></a>C++注解标签</h4><p><strong>1. <code>#pragma</code>（编译器指令）</strong></p>
+<ul>
+<li>**<code>#pragma once</code>**：替代头文件保护宏，防止重复包含；</li>
+<li>**<code>#pragma pack(n)</code>**：控制结构体&#x2F;类的内存对齐（字节对齐）；</li>
+<li>**<code>#pragma message(&quot;text&quot;)</code>**；在编译时输出自定义消息；</li>
+<li></li>
+</ul>
+<p><strong>2. <code>__declspec</code>（MSVC 特有）</strong></p>
+<ul>
+<li>**<code>__declspec(dllexport/dllimport)</code>**：标记 DLL 导出&#x2F;导入的类或函数；</li>
+<li>**<code>__declspec(align(n))</code>**：指定内存对齐（C++11 后可用 <code>alignas</code> 替代）；</li>
+</ul>
+<p><strong>3. <code>__attribute__</code>（GCC&#x2F;Clang 特有）</strong></p>
+<ul>
+<li>**<code>__attribute__((packed))</code>**：取消结构体对齐（紧凑内存布局）；</li>
+<li>**<code>__attribute__((aligned(n))</code>**：指定对齐方式（C++11 后可用 <code>alignas</code> 替代）；</li>
+</ul>
+<p>C++11 引入了标准化的属性语法 <code>[[attribute]]</code>，逐步替代部分编译器扩展：</p>
+<ul>
+<li>**<code>[[nodiscard]]</code>**：返回值不可忽略。</li>
+<li>**<code>[[deprecated]]</code>**：标记废弃。</li>
+<li>**<code>[[maybe_unused]]</code>**：抑制未使用警告。</li>
+<li>**<code>[[noreturn]]</code>**：函数不会返回。</li>
+<li>**<code>[[fallthrough]]</code>**：允许 switch-case 穿透。</li>
+</ul>
+<h4 id="函数调用的三种约定"><a href="#函数调用的三种约定" class="headerlink" title="函数调用的三种约定"></a>函数调用的三种约定</h4><p>__ cdecl、__ stdcall、__fastcall是C&#x2F;C++里中经常见到的三种函数调用方式。</p>
+<blockquote>
+<p>我们常用的函数调用方式有**__cdecl<strong>、</strong>__stdcall<strong>，C++的非静态成员函数的调用方式是</strong>__thiscall**，这些调用方式，函数参数的传递本质上是函数参数的入栈的过程，而这三种调用方式参数的入栈顺序都是从右往左的</p>
+</blockquote>
+<p>__cdecl是C&#x2F;C++默认的调用方式</p>
+<p>_stdcall是windows API函数的调用方式，WINAPI宏代替</p>
+<blockquote>
+<p>区别：两者参数都是参右向左入栈，void f(int a, int b)即push b，push a，此时esp指向变了，而__cdecl会在ecall指令返回后执行add esp 8；__stdcall则是在函数ret时不带参数返回esp需要增加的量，少了一条指令</p>
+</blockquote>
+<p>__fastcall快速调用方式。这种方式选择将参数优先从寄存器传入（ECX和EDX），剩下的参数再从右向左从栈传入。但是但需要使用ecx和edx时由callee保证将数据放入内存，返回时放回寄存器</p>
+<h2 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h2><h2 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h2><table>
+<thead>
+<tr>
+<th align="center">命令名称</th>
+<th align="center">命令缩写</th>
+<th>命令说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">run</td>
+<td align="center">r</td>
+<td>运行一个程序</td>
+</tr>
+<tr>
+<td align="center">continue</td>
+<td align="center">c</td>
+<td>让暂停的程序继续运行</td>
+</tr>
+<tr>
+<td align="center">break</td>
+<td align="center">b</td>
+<td>添加断点</td>
+</tr>
+<tr>
+<td align="center">条件断点</td>
+<td align="center"></td>
+<td><strong>break [lineNo] if [condition]<strong>或者</strong>condition 断点编号 断点触发条件</strong></td>
+</tr>
+<tr>
+<td align="center">tbreak</td>
+<td align="center">tb</td>
+<td>添加临时断点</td>
+</tr>
+<tr>
+<td align="center">backtrace</td>
+<td align="center">bt</td>
+<td>查看当前线程的调用堆栈</td>
+</tr>
+<tr>
+<td align="center">frame</td>
+<td align="center">f</td>
+<td>切换到当前调用线程的指定堆栈</td>
+</tr>
+<tr>
+<td align="center">info</td>
+<td align="center">info</td>
+<td>查看断点&#x2F;线程等信息</td>
+</tr>
+<tr>
+<td align="center">enable</td>
+<td align="center">enable</td>
+<td>启用某个断点</td>
+</tr>
+<tr>
+<td align="center">disable</td>
+<td align="center">disable</td>
+<td>禁用某个断点</td>
+</tr>
+<tr>
+<td align="center">delete</td>
+<td align="center">del</td>
+<td>删除断点</td>
+</tr>
+<tr>
+<td align="center">list</td>
+<td align="center">l</td>
+<td>显示源码</td>
+</tr>
+<tr>
+<td align="center">print</td>
+<td align="center">p</td>
+<td>打印或修改变量或寄存器值，set print element 0完整打印字符串</td>
+</tr>
+<tr>
+<td align="center">ptype</td>
+<td align="center">ptype</td>
+<td>查看变量类型</td>
+</tr>
+<tr>
+<td align="center">thread</td>
+<td align="center">thread</td>
+<td>切换到指定线程</td>
+</tr>
+<tr>
+<td align="center">next</td>
+<td align="center">n</td>
+<td>运行到下一行</td>
+</tr>
+<tr>
+<td align="center">step</td>
+<td align="center">s</td>
+<td>如果有调用函数，进入调用的函数内部，相当于step into</td>
+</tr>
+<tr>
+<td align="center">until</td>
+<td align="center">u</td>
+<td>运行到指定行停下来</td>
+</tr>
+<tr>
+<td align="center">finish</td>
+<td align="center">fi</td>
+<td>结束当前调用函数，到上一层函数调用处</td>
+</tr>
+<tr>
+<td align="center">return</td>
+<td align="center">return</td>
+<td>结束当前调用函数并返回指定值，到上一层函数调用处</td>
+</tr>
+<tr>
+<td align="center">jump</td>
+<td align="center">j</td>
+<td>将当前程序执行流跳转到指定行或地址</td>
+</tr>
+<tr>
+<td align="center">disassemble</td>
+<td align="center">dis</td>
+<td>查看汇编代码</td>
+</tr>
+<tr>
+<td align="center">set args</td>
+<td align="center"></td>
+<td>设置程序启动命令行参数</td>
+</tr>
+<tr>
+<td align="center">show args</td>
+<td align="center"></td>
+<td>查看设置的命令行参数</td>
+</tr>
+<tr>
+<td align="center">watch</td>
+<td align="center">watch</td>
+<td>监视某一个变量或内存地址的值是否发生变化，数据断点</td>
+</tr>
+<tr>
+<td align="center">display</td>
+<td align="center">display</td>
+<td>监视的变量或者内存地址，当程序中断后自动输出监控的变量或内存地址</td>
+</tr>
+<tr>
+<td align="center">dir</td>
+<td align="center">dir</td>
+<td>重定向源码文件的位置</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td>set scheduler-locking on&#x2F;step&#x2F;off</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center"></td>
+<td>set follow-fork mode parent&#x2F;child</td>
+</tr>
+</tbody></table>
+<h2 id="mysql"><a href="#mysql" class="headerlink" title="mysql"></a>mysql</h2></article><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/covers/5.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/%E9%A1%B9%E7%9B%AE/xv6/" title="xv6"><img class="cover" src="/img/covers/17.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">xv6</div></div><div class="info-2"><div class="info-item-1">book-riscv操作系统接口操作系统管理和抽象硬件，使得程序共享硬件、共享数据 内核使用cpu提供的硬件保护机制实现保护模式 文件描述符接口将文件、管道和设备之间的差异抽象出来，使它们看起来都像字节流。我们将输入和输出称为 I&#x2F;O fork和exec分开使得可以对子进程IO重定向 如果两个文件描述符是通过一系列fork和dup调用从同一个原始文件描述符派生出来的，那么它们共享一个偏移量； 父子进程各自的文件描述符表条目指向同一个文件表项 2&gt;&amp;1使得错误输出重定向到文件名描述符1，如果不加&amp;表示文件1 操作系统架构操作系统要满足复用，隔离和交互 为实现隔离，将资源抽象为服务；Unix在进程之间透明地切换硬件处理器，根据需要保存和恢复寄存器状态；文件描述符简化了交互，内核为流水线失败进程生成eof RISC-V三种指令模式：机器模式(Machine Mode)、用户模式(User Mode)和管理模式(Supervisor...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#c"><span class="toc-number">1.</span> <span class="toc-text">c++</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#define%E4%B8%8Einline%E5%8C%BA%E5%88%AB%EF%BC%9A"><span class="toc-number">1.0.1.</span> <span class="toc-text">#define与inline区别：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#auto"><span class="toc-number">1.0.2.</span> <span class="toc-text">auto</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#decltype"><span class="toc-number">1.0.3.</span> <span class="toc-text">decltype</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E5%8C%BA"><span class="toc-number">1.0.4.</span> <span class="toc-text">内存分区</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#static"><span class="toc-number">1.0.5.</span> <span class="toc-text">static</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%87%8D%E8%BD%BD%EF%BC%8C%E9%87%8D%E5%86%99%EF%BC%8C%E8%A6%86%E7%9B%96%E5%8C%BA%E5%88%AB"><span class="toc-number">1.0.6.</span> <span class="toc-text">重载，重写，覆盖区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E5%87%BD%E6%95%B0"><span class="toc-number">1.0.7.</span> <span class="toc-text">虚函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%8F%E5%8F%98%E8%BF%94%E5%9B%9E%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.0.8.</span> <span class="toc-text">协变返回类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%99%9A%E7%BB%A7%E6%89%BF"><span class="toc-number">1.0.9.</span> <span class="toc-text">虚继承</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A7%81%E6%9C%89%E7%BB%A7%E6%89%BF"><span class="toc-number">1.0.10.</span> <span class="toc-text">私有继承</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#delete%E8%AF%B4%E6%98%8E%E7%AC%A6"><span class="toc-number">1.0.11.</span> <span class="toc-text">&#x3D;delete说明符</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#lambda"><span class="toc-number">1.0.12.</span> <span class="toc-text">lambda</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF%E5%8F%98%E5%8F%82"><span class="toc-number">1.0.13.</span> <span class="toc-text">模板变参</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%81%9A%E5%90%88%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">1.0.14.</span> <span class="toc-text">聚合初始化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E5%AE%9A%E4%B9%89%E5%AD%97%E9%9D%A2%E9%87%8F"><span class="toc-number">1.0.15.</span> <span class="toc-text">用户定义字面量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B1%BB%E5%9E%8B%E5%88%AB%E5%90%8D"><span class="toc-number">1.0.16.</span> <span class="toc-text">类型别名</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RAII"><span class="toc-number">1.0.17.</span> <span class="toc-text">RAII</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88"><span class="toc-number">1.0.18.</span> <span class="toc-text">智能指针</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B7%A6%E5%80%BC%E3%80%81%E5%8F%B3%E5%80%BC%EF%BC%9A"><span class="toc-number">1.0.19.</span> <span class="toc-text">左值、右值：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%EF%BC%8C%E5%BC%95%E7%94%A8%E6%8A%98%E5%8F%A0%EF%BC%8C%E5%AE%8C%E7%BE%8E%E8%BD%AC%E5%8F%91"><span class="toc-number">1.0.20.</span> <span class="toc-text">右值引用，引用折叠，完美转发</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#constexpr"><span class="toc-number">1.0.21.</span> <span class="toc-text">constexpr</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#noexcept"><span class="toc-number">1.0.22.</span> <span class="toc-text">noexcept</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#struct%E5%92%8Cclass%E5%8C%BA%E5%88%AB"><span class="toc-number">1.0.23.</span> <span class="toc-text">struct和class区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#string-view"><span class="toc-number">1.0.24.</span> <span class="toc-text">string_view</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pimpl"><span class="toc-number">1.0.25.</span> <span class="toc-text">pimpl</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#C-%E6%B3%A8%E8%A7%A3%E6%A0%87%E7%AD%BE"><span class="toc-number">1.0.26.</span> <span class="toc-text">C++注解标签</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%9A%84%E4%B8%89%E7%A7%8D%E7%BA%A6%E5%AE%9A"><span class="toc-number">1.0.27.</span> <span class="toc-text">函数调用的三种约定</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F"><span class="toc-number">2.</span> <span class="toc-text">操作系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gdb"><span class="toc-number">3.</span> <span class="toc-text">gdb</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mysql"><span class="toc-number">4.</span> <span class="toc-text">mysql</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Jerold</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
