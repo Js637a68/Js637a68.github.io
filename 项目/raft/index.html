@@ -5,13 +5,13 @@
 <meta property="og:site_name" content="Jerold‘s PNote">
 <meta property="og:description" content="贴一个raft可视化网站，方便直观学习：Raft Consensus Algorithm CAP：**CAP:**一个分布式系统最多只能同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance）这三项中的两项。 BASE原则是CAP原则的折中，C，A，P三个都要，但是不保证每个原则的实现都是100% BA：基本可用（Basic">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/covers/14.jpg">
+<meta property="og:image" content="http://example.com/img/covers/7.jpg">
 <meta property="article:published_time" content="2024-06-25T03:58:05.000Z">
 <meta property="article:modified_time" content="2024-06-25T03:58:05.000Z">
 <meta property="article:author" content="Jerold">
 <meta property="article:tag" content="raft">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/img/covers/14.jpg"><link rel="shortcut icon" href="/img/logo.jpg"><link rel="canonical" href="http://example.com/%E9%A1%B9%E7%9B%AE/raft/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+<meta name="twitter:image" content="http://example.com/img/covers/7.jpg"><link rel="shortcut icon" href="/img/logo.jpg"><link rel="canonical" href="http://example.com/%E9%A1%B9%E7%9B%AE/raft/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
     (() => {
       
     const saveToLocal = {
@@ -149,7 +149,7 @@
   isHighlightShrink: false,
   isToc: true,
   isShuoshuo: false
-}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bg2.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/14.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Jerold‘s PNote</span></a><a class="nav-page-title" href="/"><span class="site-name">raft学习与实现</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">raft学习与实现</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-25T03:58:05.000Z" title="发表于 2024-06-25 2024-06-25T11:58:05+08:00">2024-06-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-06-25T03:58:05.000Z" title="更新于 2024-06-25 2024-06-25T11:58:05+08:00">2024-06-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%A1%B9%E7%9B%AE/">项目</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>贴一个raft可视化网站，方便直观学习：<a target="_blank" rel="noopener" href="https://raft.github.io/">Raft Consensus Algorithm</a></p>
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bg2.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/7.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Jerold‘s PNote</span></a><a class="nav-page-title" href="/"><span class="site-name">raft学习与实现</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">raft学习与实现</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-06-25T03:58:05.000Z" title="发表于 2024-06-25 2024-06-25T11:58:05+08:00">2024-06-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-06-25T03:58:05.000Z" title="更新于 2024-06-25 2024-06-25T11:58:05+08:00">2024-06-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%A1%B9%E7%9B%AE/">项目</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>贴一个raft可视化网站，方便直观学习：<a target="_blank" rel="noopener" href="https://raft.github.io/">Raft Consensus Algorithm</a></p>
 <h1 id="CAP："><a href="#CAP：" class="headerlink" title="CAP："></a>CAP：</h1><p>**CAP:**一个分布式系统最多只能同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance）这三项中的两项。</p>
 <p><strong>BASE</strong>原则是CAP原则的折中，C，A，P三个都要，但是不保证每个原则的实现都是100%</p>
 <p>BA：基本可用（Basically Available） S：软状态（Soft State） E：最终一致性（Eventual Consistency） CAP原则是三选二； </p>
@@ -513,4 +513,427 @@
 <p>follower and candidate始终运行一个runElectionTimer协程，electionTimeout为150~300ms，这还使用10毫秒的ticker负责判断状态，以快速响应该节点的状态变化，同一时间可能运行多个runElectionTimer协程，通过term判断旧的退出</p>
 <p>leader运行一个协程，每50ms执行leaderSendheartbeats</p>
 </blockquote>
-</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/raft/">raft</a></div><div class="post-share"><div class="social-share" data-image="/img/covers/14.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/c++/c++/" title="c++"><img class="cover" src="/img/covers/11.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">c++</div></div><div class="info-2"><div class="info-item-1">new 所得block in VC动态分配所得内存块 in VC 分别debug mod 和 release debug 两个cookie + 32 + 4，如果数组 +4，VC下内存块16字节对齐 + 本身内存对齐大小  宏使用#define和#undef限制宏作用域，不要加;，否则会被当作程序体；宏展开只是在预处理阶段单纯的文本替换，例如类型别名时并不具有类型定义说明的功能，一些常见宏使用如__LINE__ __FUNCTION__ __FILE__等 #if #ifdef条件判断，例如#ifdef __cplusplus extern &quot;c&quot;&#123; #endif 宏定义执行体通过 do{}while(0)保证执行体里一定都被执行一次，比如在if后使用宏等，当参数为表达式时给每个参数加上()，例如#define mul(a, b)  a*b add(1+2,3+4)即出现歧义 使用#将参数转换为字符 #define str(x) #x 使用##表示连接两个参数#define cont(a,b)...</div></div></div></a><a class="pagination-related" href="/%E9%A1%B9%E7%9B%AE/corolib/" title="基于epoll支持异步IO读写的协程库"><img class="cover" src="/img/covers/2.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">基于epoll支持异步IO读写的协程库</div></div><div class="info-2"><div class="info-item-1">协程用户级线程 线程运行的时候主要依靠寄存器和栈空间，而协程正是由用户自己维护寄存器和栈空间地址 线程调度由操作系统来进行切换，需要系统调用陷入内核和上下文切换，而协程的调度只需要改变寄存器的值 对称协程与非对称协程： 对称协程协程之间可以直接相互调度和切换 非对称协程被调度协程只能将控制权返回给调度协程 非对称协程需要一个协程调度器类似池的概念，比较适合IO密集型；而对称协程适合计算密集型 协程实现三种方式： ucontex 通过是同ucontex函数族实现协程，struct ucontext中，设置uc_link指向恢复的上下文，uc_stack指向改协程使用的栈 getcontext()初始化，填充当前上下文 makecontext()设置协程执行函数，设置上下文 swapcontext()上下文切换，当前上下文保存到oucp，切换到ucp setcontext()慎用，直接跳到指定上下文，当前上下文就没有了 12345678910111213#include &lt;ucontext.h&gt;typedef struct ucontext &#123;   ...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#CAP%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">CAP：</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#raft"><span class="toc-number">2.</span> <span class="toc-text">raft</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%86%E5%AF%BC%E8%80%85%E9%80%89%E4%B8%BE"><span class="toc-number">2.1.</span> <span class="toc-text">领导者选举</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6"><span class="toc-number">2.2.</span> <span class="toc-text">日志复制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-number">2.3.</span> <span class="toc-text">安全性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E5%8E%8B%E7%BC%A9"><span class="toc-number">2.4.</span> <span class="toc-text">日志压缩</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E6%88%90%E5%91%98%E5%8F%98%E6%9B%B4"><span class="toc-number">2.5.</span> <span class="toc-text">集群成员变更</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BA%A4%E4%BA%92"><span class="toc-number">2.6.</span> <span class="toc-text">客户端交互</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%A7%E8%83%BD"><span class="toc-number">2.7.</span> <span class="toc-text">性能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#no-op"><span class="toc-number">2.8.</span> <span class="toc-text">no-op</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%8D%E5%88%B6%E7%8A%B6%E6%80%81%E6%9C%BA"><span class="toc-number">2.9.</span> <span class="toc-text">复制状态机</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Paxos%E6%AF%94%E8%BE%83"><span class="toc-number">3.</span> <span class="toc-text">Paxos比较</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E"><span class="toc-number">4.</span> <span class="toc-text">存储引擎</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#B%E6%A0%91"><span class="toc-number">4.1.</span> <span class="toc-text">B树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LSM%E6%A0%91"><span class="toc-number">4.2.</span> <span class="toc-text">LSM树</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Raft%E5%AE%9E%E7%8E%B0"><span class="toc-number">5.</span> <span class="toc-text">Raft实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#leader-election"><span class="toc-number">5.1.</span> <span class="toc-text">leader election</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#log-replication"><span class="toc-number">5.2.</span> <span class="toc-text">log replication</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Jerold</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
+<h1 id="6-284"><a href="#6-284" class="headerlink" title="6.284"></a>6.284</h1><h2 id="MapReducec"><a href="#MapReducec" class="headerlink" title="MapReducec"></a>MapReducec</h2><p>用户指定一个用于处理<strong>k&#x2F;v对</strong>并生成<strong>中间态k&#x2F;v对集合</strong>的映射（map）函数，以及一个用于合并所有具有相同中间态key的中间态value值的归约（reduce）函数。</p>
+<p><strong>工作模型：</strong></p>
+<p>1、用户编写Map函数，其获得一个输入的k&#x2F;v对并生成一个中间态的k&#x2F;v对。<br>2、MapReduce库对所有的k&#x2F;v对进行分组，使得所有有着相同中间态key值的k&#x2F;v对的value值组合在一起，然后将它们传递给Reduce函数。</p>
+<p>3、用户编写Reduce函数，其接收一个中间态的key值和与该键对应的一组value值的集合。它会将这些value值进行统一的合并以形成一个可能更小的value值集合。这允许我们得以处理那些无法被完整放入内存的，过大的列表集合。</p>
+<p>例子：</p>
+<p><strong>URL访问频率计数：</strong>map函数处理网页请求的处理日志，并且输出&lt;URL,1&gt;的键值对。mapreduce进行排序分类成一个个list。reduce函数累加所有具有相同URL键值对的value值，并且输出一个&lt;URL,总访问数&gt;的键值对。</p>
+<p><strong>实现：</strong></p>
+<p>1、将文件分割成M份</p>
+<p>2、master将M份任务通过调度分配到多个Map worker</p>
+<p>3、多个Map work用自定义的Map函数生成键值对的形式，并且放入缓存中，这里生成R个临时文件对应后面R个work</p>
+<p>4、缓存中的kv被周期性的写入通过分区函数划分的R个磁盘区域，告诉master位置，master通知reduce worker位置</p>
+<p>5、reduce worker知道这些位置，通过rpc读取数据，读取了所有数据后进行排序，这样相同key的kv被分组在一起</p>
+<p>6、调用reduce函数进行数据处理和输出</p>
+<p>7、最终唤醒用户返回数据</p>
+<img src="C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250522125955300.png" alt="image-20250522125955300" style="zoom: 60%;" />
+
+<p><strong>数据结构：</strong></p>
+<p>master存储了对应的任务状态(闲置的，运行中，或者已完成)，以及worker机器的id(针对非空闲的任务)。</p>
+<p>对于每个已完成的map任务，master存储了由map任务生成的R个中间态文件区域的位置和大小。</p>
+<p><strong>容错：</strong></p>
+<p>心跳+重置状态：</p>
+<p>1、master会周期性的ping每一个worker。如果在一定的时间内没有接收到来自某一worker的响应，master将会将worker标记为有故障(failed)。所有由该worker完成的map任务将会被重置回初始状态，因此这些map任务能被其它worker去调度执行。</p>
+<p>2、当一个map任务在worker A上被首次执行，不久后又被worker B执行(因为worker A发生了故障)，所有执行reduce任务的worker将会被通知需要重新执行。所有还没有从worker A处读取(完整)数据的reduce任务将改为从worker B处读取数据。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>分布式目的和挑战：</p>
+<ul>
+<li>高性能计算</li>
+<li>提供容错</li>
+<li>天然原因：银行之间转账</li>
+<li>安全：将代码分散到不同计算机，限制出错域</li>
+</ul>
+<p>挑战：</p>
+<ul>
+<li>因为系统中存在很多部分，这些部分又在并发执行，你会遇到并发编程和各种复杂交互所带来的问题，以及时间依赖的问题（比如同步，异步）。这让分布式系统变得很难。</li>
+<li>另一个导致分布式系统很难的原因是，分布式系统有多个组成部分，再加上计算机网络，你会会遇到一些意想不到的故障。如果你只有一台计算机，那么它通常要么是工作，要么是故障或者没电，总的来说，要么是在工作，要么是没有工作。而由多台计算机组成的分布式系统，可能会有一部分组件在工作，而另一部分组件停止运行，或者这些计算机都在正常运行，但是网络中断了或者不稳定。所以，局部错误也是分布式系统很难的原因。</li>
+<li>最后一个导致分布式系统很难的原因是，人们设计分布式系统的根本原因通常是为了获得更高的性能，比如说一千台计算机或者一千个磁盘臂达到的性能。但是实际上一千台机器到底有多少性能是一个棘手的问题，这里有很多难点。所以通常需要倍加小心地设计才能让系统实际达到你期望的性能。</li>
+</ul>
+<p><strong>可扩展性：</strong></p>
+<p>我们希望构建了一个系统，并且只要增加计算机的数量，系统就能相应提高性能或者吞吐量。</p>
+<p>但是会瓶颈转移，当反向代理扩展到一定水平就需要去扩展数据库。现实中这很难实现无限扩展，需要一些架构设计来将这个可扩展性无限推进下去。</p>
+<p><strong>可用性：</strong></p>
+<p>指系统的容错性：1、系统能屏蔽特定范围内故障的错误，能够在出错时继续运行；2、具备自我恢复性，将数据放入磁盘，在修复后能完全正确的重新运行</p>
+<p>实现容错的两个工具：</p>
+<ol>
+<li>非易失存储，但是频繁的更新非易失存储是代价很高的操作</li>
+<li>复制，本质是实现复制状态机</li>
+</ol>
+<p><strong>一致性：</strong></p>
+<ul>
+<li><p>强一致性：可以保证get得到的是put写入的最新的数据；需要做大量的通信，比如同时读取所有副本，并使用最新的数据</p>
+</li>
+<li><p>弱一致性：系统不会做出类似的保证，通过get看到的可能仍然是一个旧数据。</p>
+</li>
+</ul>
+<p> 人们常常会使用弱一致系统，你只需要更新最近的数据副本，并且只需要从最近的副本获取数据。</p>
+<h2 id="GFS"><a href="#GFS" class="headerlink" title="GFS"></a>GFS</h2><p>设计难点：</p>
+<blockquote>
+<p>多副本设计中，C1，C2写请求，倘若没有没有做任何事情来保障两台服务器以相同的顺序处理这2个请求，会发生数据不一致情况</p>
+</blockquote>
+<p>在这里，Master节点用来管理文件和Chunk的信息，而Chunk服务器用来存储实际的数据</p>
+<p>更进一步，我们看一下GFS的一致性以及GFS是如何处理故障。为了了解这些，我们需要知道Master节点内保存的数据内容，这里我们关心的主要是两个表单：</p>
+<ul>
+<li>第一个是文件名到Chunk ID或者Chunk Handle数组的对应。这个表单告诉你，文件对应了哪些Chunk。但是只有Chunk ID是做不了太多事情的，所以有了第二个表单。</li>
+<li>第二个表单记录了Chunk ID到Chunk数据的对应关系。这里的数据又包括了：<ul>
+<li>每个Chunk存储在哪些服务器上，所以这部分是Chunk服务器的列表</li>
+<li>每个Chunk当前的版本号，所以Master节点必须记住每个Chunk对应的版本号。</li>
+<li>所有对于Chunk的写操作都必须在主Chunk（Primary Chunk）上顺序处理，主Chunk是Chunk的多个副本之一。所以，Master节点必须记住哪个Chunk服务器持有主Chunk。</li>
+<li>并且，主Chunk只能在特定的租约时间内担任主Chunk，所以，Master节点要记住主Chunk的租约过期时间。</li>
+</ul>
+</li>
+</ul>
+<p>这里在磁盘中维护log而不是数据库的原因是，数据库本质上来说是某种B树（b-tree）或者hash table，相比之下，追加log会非常的高效，因为你可以将最近的多个log记录一次性的写入磁盘。因为这些数据都是向同一个地址追加，这样只需要等待磁盘的磁碟旋转一次。而对于B树来说，每一份数据都需要在磁盘中随机找个位置写入。所以使用Log可以使得磁盘写入更快一些。</p>
+<p><strong>Read：</strong></p>
+<p>1、客户端（或者应用程序）将文件名和偏移量发送给Master。</p>
+<p>2、Master节点将Chunk Handle（也就是ID，记为H）和服务器列表发送给客户端。</p>
+<p>3、客户端挑选最近的一个服务器，发送读请求，并且客户端会缓存Chunk和服务器的对应关系</p>
+<p>4、将Chunk Handle和偏移量发送给那个Chunk服务器，服务器找到对应的文件，读取数据并返回</p>
+<blockquote>
+<p>读请求刚好越界：客户端会进行分割，发送多个读请求，接收到buffer中组合</p>
+</blockquote>
+<p><strong>Write：</strong></p>
+<p>1、写操作以追加的方式进行</p>
+<p>2、客户端向master申请最后一个chunk。master去寻找主副本，若找不到，Master节点需要能够在Chunk的多个副本中识别出最新的。每个Chunk可能同时有多个副本，最新的副本是指，副本中保存的版本号与Master中记录的Chunk的版本号一致。</p>
+<p>3、当客户端想要对文件进行追加，但是又不知道文件尾的Chunk对应的Primary在哪时，Master会等所有存储了最新Chunk版本的服务器集合完成，然后挑选一个作为Primary，其他的作为Secondary。之后，Master会增加版本号，并将版本号写入磁盘，这样就算故障了也不会丢失这个数据。</p>
+<p>4、Primary和Secondary服务器都会将版本号存储在本地的磁盘中，向Master报告本地保存的Chunk的实际版本号</p>
+<p>5、Master管理着版本号，目的：将实际更新Chunk的能力转移给Primary服务器。如果Master节点故障重启，还是可以在相同的Primary和Secondary服务器上继续更新Chunk</p>
+<p>primary有着租约时间代表有效的管理能力时间，例如60秒后失效，master得重新选取primary</p>
+<p>6、Primary和second服务器将数据写入临时位置，当所有second回复再写入文件</p>
+<p>7、所有的Secondary都有相同的版本号。版本号只会在Master指定一个新Primary时才会改变。</p>
+<p><strong>GFS一致性要求：</strong></p>
+<p>1、需要让Primary来探测重复的请求</p>
+<p>2、Secondary必须回应，并且能被移除</p>
+<p>3、两阶段提交</p>
+<p>4、当一个Primary崩溃了，一个Secondary会接任成为新的Primary，新的Primary上任时，需要显式的与Secondary进行同步，以确保操作历史的结尾是相同的。</p>
+<p>5、系统要么需要将所有的读请求都发送给Primary，对于Secondary需要一个租约系统</p>
+<hr>
+<h2 id="FT-VM"><a href="#FT-VM" class="headerlink" title="FT VM"></a>FT VM</h2><p>复制操作：</p>
+<ul>
+<li>状态转移：Primary将自己完整状态，比如说内存中的内容，拷贝并发送给Backup。</li>
+<li>复制状态机：通常来说，如果有两台计算机，如果它们从相同的状态开始，并且它们以相同的顺序，在相同的时间，看到了相同的输入，那么它们会一直互为副本，并且一直保持一致。</li>
+</ul>
+<blockquote>
+<p>随机操作在复制状态机会怎么处理？</p>
+</blockquote>
+<p>Backup不会执行这些指令，而是在应该执行指令的地方，等着Primary告诉它，正确的答案是什么，并将监听到的答案返回给软件。</p>
+<blockquote>
+<p>VMware FT 独特之处在于其机器级的全状态复制，使其能够对任意软件提供无修改的容错能力，而大多数现代系统采用更高效但依赖应用逻辑参与的应用级复制方案。</p>
+</blockquote>
+<p>在 VMware FT 这样的系统中，“机器级复制”包括：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>复制内容说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CPU 状态</td>
+<td>所有寄存器、程序计数器（PC）、条件码、状态寄存器等</td>
+</tr>
+<tr>
+<td>内存状态</td>
+<td>所有 RAM 的内容 —— 包括应用程序的堆、栈、代码段、全局变量</td>
+</tr>
+<tr>
+<td>设备状态</td>
+<td>虚拟设备（如网卡、磁盘控制器等）的寄存器状态和 I&#x2F;O 队列</td>
+</tr>
+<tr>
+<td>非确定性事件记录</td>
+<td>中断、时钟读取、随机数、DMA 操作、I&#x2F;O 完成等事件发生的顺序和时间点</td>
+</tr>
+<tr>
+<td>指令执行顺序</td>
+<td>确保所有指令执行的顺序保持一致，哪怕有中断插入</td>
+</tr>
+</tbody></table>
+<h3 id="确认性重放"><a href="#确认性重放" class="headerlink" title="确认性重放"></a>确认性重放</h3><p>目的：使<strong>备份虚拟机（Backup VM）能精确重现</strong>主虚拟机（Primary VM）的执行，从而达到两者在逻辑上的“锁步同步”。</p>
+<p>原理：将主 VM 执行过程中的<strong>所有非确定性事件和输入</strong>（如中断、时钟读取、网络包等）都记录为日志，并将这些日志实时传送到备份 VM。</p>
+<p>实现：</p>
+<p><strong>主 VM 执行时记录日志</strong>：</p>
+<ul>
+<li>所有输入：网络包、磁盘读取、用户输入等；</li>
+<li>所有非确定性事件：如 CPU 时间戳读取、虚拟中断、DMA、随机数等；</li>
+<li>日志由 hypervisor 拦截生成。</li>
+</ul>
+<p><strong>备 VM 实时回放日志</strong>：</p>
+<ul>
+<li>按主 VM 的顺序重放所有输入和事件；</li>
+<li>确保在<strong>精确指令位置</strong>重放中断等事件，防止状态偏差。</li>
+</ul>
+<p><strong>硬件支持</strong>：</p>
+<ul>
+<li>使用 Intel&#x2F;AMD 的性能计数器帮助记录中断触发的具体指令点。</li>
+</ul>
+<p><strong>无需“epoch”机制</strong>：</p>
+<ul>
+<li>与旧系统不同，VMware 的实现能<strong>精确到单个事件&#x2F;指令</strong>，无需将多个事件“批量处理”。</li>
+</ul>
+<h3 id="FT协议"><a href="#FT协议" class="headerlink" title="FT协议"></a>FT协议</h3><p>若主 VM 故障，备 VM 接管后，其状态应与主 VM 最后一次“对外输出”时的状态一致。</p>
+<p>主 VM 不得发送任何对外输出，直到备 VM 确认收到与该输出操作相关的日志条目。</p>
+<p>实现：</p>
+<p>primary进行<strong>控制输出</strong>，1、生成一个“日志条目”，记录该输出操作；2、等待备 VM 回传“ACK 确认”；3、然后再发送这个输出。</p>
+<blockquote>
+<p><strong>确认性重放</strong>通过精确记录和重放所有非确定性事件，使主备 VM 执行保持一致；</p>
+<p><strong>FT 协议</strong>通过“输出延迟直到日志确认”的机制，确保即使主 VM 故障也不会造成对外状态不一致。</p>
+</blockquote>
+<hr>
+<h2 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h2><p><strong>强一致性模型：</strong></p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>描述</th>
+<th>典型系统</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>线性一致性（Linearizability）</td>
+<td>最严格的强一致性模型；读写看起来发生在一个“全局时间点”上，保持<strong>真实时间顺序</strong></td>
+<td>ZooKeeper、Etcd、Raft</td>
+</tr>
+<tr>
+<td>顺序一致性（Sequential Consistency）</td>
+<td>稍弱于线性一致性；全局操作有序，但顺序不一定符合真实时间</td>
+<td>多处理器系统、部分共享内存系统</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>线性一致性必须与真实时间顺序符合，所以是最强的模型，顺序一致性联想到内存模型的顺序一致性模型，也就是说所有进程看到一样的顺序操作即可，即使有多种顺序操作可能发生，每一种都是合理的，但所有人只能同时看到一种</p>
+</blockquote>
+<p><strong>弱一致性模型：</strong></p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>描述</th>
+<th>典型系统</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最终一致性（Eventual Consistency）</td>
+<td>最常见的弱一致性模型；最终所有副本趋于一致，但过程不保证顺序</td>
+<td>Amazon Dynamo、Cassandra</td>
+</tr>
+<tr>
+<td>因果一致性（Causal Consistency）</td>
+<td>保证有因果关系的操作顺序一致，无关操作顺序不做要求</td>
+<td>COPS、Orleans</td>
+</tr>
+<tr>
+<td>会话一致性（Session Consistency）</td>
+<td>每个客户端看到自己写过的值，别人的修改可能延迟可见</td>
+<td>DynamoDB 的 Session consistency</td>
+</tr>
+<tr>
+<td>弱一致性（Weak Consistency）</td>
+<td>完全不保证每次读到什么值，只在某些“同步点”上有一致性</td>
+<td>写优化存储系统</td>
+</tr>
+</tbody></table>
+<p><strong>特征：</strong></p>
+<ul>
+<li><p>性能更好，适合高可用、大规模系统；</p>
+</li>
+<li><p>写入不会立即被所有副本看到，可能出现读旧值；</p>
+</li>
+<li><p>适合容错性更强但一致性要求没那么高的场景，如社交网络、电商系统中的推荐信息。</p>
+</li>
+</ul>
+<hr>
+<h2 id="raft-1"><a href="#raft-1" class="headerlink" title="raft"></a>raft</h2><p>在以前，因为都是主master节点协调管理，有单点故障；而多台的话为了防止脑裂，只有：1构建永远不会故障的网络；2、人工解决问题；</p>
+<p>过半票决的出现解决了脑裂问题，所以说为什么服务器数量要是奇数，这样的网络分区不是对称的，同时如果系统有 2 * F + 1 个服务器，那么系统最多可以接受F个服务器出现故障，仍然可以正常工作。</p>
+<blockquote>
+<p>为什么Raft系统这么关注Log，Log究竟起了什么作用？</p>
+</blockquote>
+<p>1、Log是Leader用来对操作排序的一种手段。</p>
+<p>2、Log是用来存放临时操作的地方。</p>
+<p>3、Leader需要能够向Follower重传丢失的Log消息。所以，Leader也需要一个地方来存放客户端请求的拷贝。即使对那些已经commit的请求，为了能够向丢失了相应操作的副本重传，也需要存储在Leader的Log中。</p>
+<p>4、Log也会被用来持久化存储操作，服务器可以依赖这些操作来恢复状态。</p>
+<blockquote>
+<p>客户端如何请求？应用层接口是怎么样的？</p>
+</blockquote>
+<p>在每个副本中，raft和kv之间有两个接口：</p>
+<p>1、start函数，客户端向kv请求，kv转发到raft层，马上返回，这是因为请求不一定commit，start会返回index和term</p>
+<p>2、raft层通过go channle发送给kv，然后kv可以返回给客户端了</p>
+<blockquote>
+<p>为什么要有leader？</p>
+</blockquote>
+<p>通常情况下，如果服务器不出现故障，有一个Leader的存在，会使得整个系统更加高效。</p>
+<p>对于一个无Leader的系统，通常需要一轮消息来确认一个临时的Leader，之后第二轮消息才能确认请求。</p>
+<p>我的理解是多个客户端请求时必须有一个临时leader来协调，不然每个副本都可以复制log，到底该应用谁的？存在被覆盖或者顺序不一致这些问题</p>
+<blockquote>
+<p>选举定时器</p>
+</blockquote>
+<p>1、避免分割投票，使用随机化去掉节点之间的同步性</p>
+<p>2、下限应该为心跳间隔的几倍</p>
+<p>3、上限应该考虑系统故障的频繁性</p>
+<p>4、不同节点的选举定时器的超时时间差（S2和S3之间）必须要足够长，使得第一个开始选举的节点能够完成一轮选举。这里至少需要大于发送一条RPC所需要的往返（Round-Trip）时间。</p>
+<blockquote>
+<p>哪些数据需要持久化？</p>
+</blockquote>
+<p>Log条目，Term，votedfor</p>
+<h2 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>ZooKeeper 是一个<strong>分布式协调系统</strong>，为多节点分布式应用中的进程提供一致性、协调服务。</p>
+<blockquote>
+<p>“ZooKeeper 是关键基础设施的一部分，目标是提供一个简单且高性能的内核，使客户端能基于它构建更复杂的协调原语。”</p>
+</blockquote>
+<ul>
+<li>ZooKeeper 是中间件底层的一部分（critical infrastructure）；</li>
+<li>核心要小而快，让更复杂的功能由客户端组合。</li>
+</ul>
+<p>“它结合了组播、共享寄存器和分布式锁服务的元素，并通过复制的集中式服务（即多副本）实现。”</p>
+<p><strong>特性：</strong></p>
+<ul>
+<li><strong>Wait-free</strong>：客户端操作不会被阻塞（尤其是读操作）； ZooKeeper 选择使用 <strong>非阻塞的 wait-free 数据对象</strong>（比如 znodes），这些对象像文件系统一样组织。</li>
+<li><strong>Watch机制</strong>：类似“缓存失效通知”，客户端能在数据变动时收到事件通知；</li>
+<li>接口简单但功能强大，适合构建更高层服务。</li>
+<li><strong>FIFO：</strong>同一客户端操作按顺序执行</li>
+</ul>
+<p><strong>保证：</strong>“ZooKeeper 保证客户端请求 FIFO 顺序执行，并对所有写操作提供线性一致性。”</p>
+<p><strong>性能：</strong>写由 Leader 控制，读操作可以由 Follower 本地直接处理，提升并发性能</p>
+<p><strong>目的：</strong>为分布式系统提供各种协调服务，传统做法是：为每种功能单独开发服务（比如 Amazon SQS 专注于消息队列，Chubby 是锁服务）。例如<strong>配置管理（Configuration）</strong>、<strong>组成员管理、领导者选举（Leader Election）</strong>、<strong>锁（Locks）</strong> 实现互斥访问。</p>
+<p>并且提供API，使得应用开发者可基于这个 API 自定义所需的协调逻辑，这样 ZooKeeper 的内核就不需要频繁修改，更灵活、适配性更强。</p>
+<p><strong>实现：</strong></p>
+<ul>
+<li>使用 <strong>Zab（ZooKeeper Atomic Broadcast）协议</strong> 实现写操作的线性一致性；</li>
+<li>使用 <strong>流水线处理架构（pipelined architecture）</strong> 支持高吞吐并发；</li>
+<li>支持异步操作，客户端可以并发提交多个请求，避免初始化延迟；</li>
+<li>读操作在本地处理，<strong>不需要用 Zab 排序</strong>，并借助客户端缓存 + Watch 增强性能。</li>
+</ul>
+<p><strong>与 Chubby 的对比：</strong></p>
+<table>
+<thead>
+<tr>
+<th>点</th>
+<th>ZooKeeper</th>
+<th>Chubby</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>缓存机制</td>
+<td>客户端自己缓存 + Watch 通知</td>
+<td>服务端主动管理缓存，更新时会阻塞其他客户端</td>
+</tr>
+<tr>
+<td>阻塞操作</td>
+<td>避免阻塞操作（更轻量）</td>
+<td>有锁、open&#x2F;close 等阻塞操作</td>
+</tr>
+<tr>
+<td>对故障客户端的处理</td>
+<td>Watch 机制<strong>完全避免</strong>慢客户端影响系统</td>
+<td>使用 Lease 限制影响，但仍可能被阻塞</td>
+</tr>
+</tbody></table>
+<h3 id="znode"><a href="#znode" class="headerlink" title="znode"></a>znode</h3><p><strong>znode 是 ZooKeeper 数据树中的一个节点</strong>。每个 znode 都有唯一的路径（类似文件路径），比如 <code>/app/config</code>。ZooKeeper 中的 znode 分为两大类：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Regular znode（常规节点）</strong></td>
+<td>客户端创建，直到主动删除之前一直存在</td>
+</tr>
+<tr>
+<td><strong>Ephemeral znode（临时节点）</strong></td>
+<td>会话断开时自动删除，适合表示临时存在性（如进程状态）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>创建 znode 时还可以设置 <code>sequential</code> 标志，会自动在 znode 名字后附加一个递增序号，用于实现有序性（如队列、选主等）。</p>
+</blockquote>
+<h3 id="znode-能干什么？"><a href="#znode-能干什么？" class="headerlink" title="znode 能干什么？"></a>znode 能干什么？</h3><ol>
+<li><strong>存储配置信息和状态数据</strong><br> 由于 znode 可以存储小量数据，很多分布式系统把配置信息和元数据放到 ZooKeeper 的 znode 上，实现配置管理和共享。</li>
+<li><strong>协调分布式应用</strong><br> ZooKeeper 作为分布式协调服务，利用 znode 实现：<ul>
+<li><strong>分布式锁</strong>：创建临时顺序节点，排队获取锁。</li>
+<li><strong>选举领导者</strong>：利用顺序节点选出 leader 节点。</li>
+<li><strong>服务发现</strong>：服务启动时在 ZooKeeper 上创建临时节点，客户端通过读取节点判断服务是否在线。</li>
+</ul>
+</li>
+<li><strong>事件监听（Watch）</strong><br> 客户端可以对 znode 设置监听（watch），当节点数据或子节点发生变化时，客户端会收到通知，从而实现实时响应。</li>
+<li><strong>保存元数据和协调状态</strong><br> ZooKeeper 的强一致性保证让 znode 成为分布式应用之间同步状态和数据的可靠媒介。</li>
+</ol>
+<h3 id="Watch-机制（事件触发通知）"><a href="#Watch-机制（事件触发通知）" class="headerlink" title="Watch 机制（事件触发通知）"></a>Watch 机制（事件触发通知）</h3><ul>
+<li>客户端在读取数据时可附带 <code>watch=true</code>；</li>
+<li>一旦该 znode 被修改，ZooKeeper 会<strong>异步通知客户端</strong>；</li>
+<li>特性：<ul>
+<li>Watch 是<strong>一次性的</strong>（触发后即失效）；</li>
+<li>通知的是“发生了变化”，<strong>不会告诉你具体改了什么</strong>；</li>
+<li>Session 事件（如连接丢失）也会通过 Watch 回调告知，提示 Watch 事件可能延迟。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>客户端连接zookeeper后启动一个session会话，会话可在多个 ZooKeeper 服务器之间迁移，临时节点和 Watch 都是 <strong>基于 Session 生命周期管理的</strong>。</p>
+</blockquote>
+<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>功能与说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>create(path, data, flags)</code></td>
+<td>创建一个 znode，写入数据 <code>data[]</code>，并返回 znode 的路径名。通过 <code>flags</code> 参数选择节点类型（<strong>常规&#x2F;临时&#x2F;顺序</strong>）</td>
+</tr>
+<tr>
+<td><code>delete(path, version)</code></td>
+<td>删除指定路径的 znode，若其版本号与 <code>version</code> 匹配（用于实现<strong>条件删除</strong>）</td>
+</tr>
+<tr>
+<td><code>exists(path, watch)</code></td>
+<td>查询某 znode 是否存在，若 <code>watch=true</code> 则在其状态变动时触发通知</td>
+</tr>
+<tr>
+<td><code>getData(path, watch)</code></td>
+<td>获取指定 znode 的数据和元数据（如版本号），支持设置 watch</td>
+</tr>
+<tr>
+<td><code>setData(path, data, version)</code></td>
+<td>修改 znode 数据，若其当前版本号与传入 <code>version</code> 匹配；<code>-1</code> 表示忽略版本检查</td>
+</tr>
+<tr>
+<td><code>getChildren(path, watch)</code></td>
+<td>获取某个 znode 的子节点列表，支持 watch</td>
+</tr>
+<tr>
+<td><code>sync(path)</code></td>
+<td>等待所有 pending 的更新操作传播到当前客户端连接的服务器；<code>path</code> 参数暂时未使用</td>
+</tr>
+</tbody></table>
+<h3 id="zookeeper顺序性保证"><a href="#zookeeper顺序性保证" class="headerlink" title="zookeeper顺序性保证"></a>zookeeper顺序性保证</h3><table>
+<thead>
+<tr>
+<th>保证类型</th>
+<th>含义</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>A-Linearizability（异步线性一致性）</strong></td>
+<td>所有<strong>修改 ZooKeeper 状态</strong>的操作是原子、有序的（全局顺序）</td>
+<td>类似标准线性一致性（客户端一次只能有一个正在执行的操作），但允许客户端同时发起多个操作，支持更高效的异步处理</td>
+</tr>
+<tr>
+<td><strong>FIFO Client Order</strong></td>
+<td>来自同一个客户端的所有请求按发送顺序执行</td>
+<td>保证单客户端观察一致性，支持异步并发调用</td>
+</tr>
+</tbody></table>
+<p>写请求保证了全局一致性，但是读请求在副本进行，但是提供了<code>sync()</code>来读取最新状态</p>
+<blockquote>
+<p>考虑一个场景，一个新上线的leader需要更新多个配置项，我的理解是：</p>
+</blockquote>
+<p>leader做了这些事：1、删除ready znode；2、更新这些配置项；3、创建ready znode</p>
+<p>这样客户端看到ready znode时就说明 Leader 的所有配置更新都已经完成；如果新leader宕机也不会让客户端使用这些不完全更新的配置；</p>
+<p>并且一个进程在读取旧ready znode时也进行监听，watch机制让该进程知道新leader删除了ready znode</p>
+<blockquote>
+<p>ZooKeeper 通过 <strong>异步线性一致性 + 客户端 FIFO 顺序</strong> 构建了高效而强一致的协调服务，支持异步调用、快速批量操作、watch 通知顺序保证和 sync 强制同步读，是满足分布式一致性与性能需求的重要基础设施。</p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/raft/">raft</a></div><div class="post-share"><div class="social-share" data-image="/img/covers/7.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/c++/c++/" title="c++"><img class="cover" src="/img/covers/11.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">c++</div></div><div class="info-2"><div class="info-item-1">new 所得block in VC动态分配所得内存块 in VC 分别debug mod 和 release debug 两个cookie + 32 + 4，如果数组 +4，VC下内存块16字节对齐 + 本身内存对齐大小  宏使用#define和#undef限制宏作用域，不要加;，否则会被当作程序体；宏展开只是在预处理阶段单纯的文本替换，例如类型别名时并不具有类型定义说明的功能，一些常见宏使用如__LINE__ __FUNCTION__ __FILE__等 #if #ifdef条件判断，例如#ifdef __cplusplus extern &quot;c&quot;&#123; #endif 宏定义执行体通过 do{}while(0)保证执行体里一定都被执行一次，比如在if后使用宏等，当参数为表达式时给每个参数加上()，例如#define mul(a, b)  a*b add(1+2,3+4)即出现歧义 使用#将参数转换为字符 #define str(x) #x 使用##表示连接两个参数#define cont(a,b)...</div></div></div></a><a class="pagination-related" href="/%E9%A1%B9%E7%9B%AE/corolib/" title="基于epoll支持异步IO读写的协程库"><img class="cover" src="/img/covers/2.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">基于epoll支持异步IO读写的协程库</div></div><div class="info-2"><div class="info-item-1">协程用户级线程 线程运行的时候主要依靠寄存器和栈空间，而协程正是由用户自己维护寄存器和栈空间地址 线程调度由操作系统来进行切换，需要系统调用陷入内核和上下文切换，而协程的调度只需要改变寄存器的值 对称协程与非对称协程： 对称协程协程之间可以直接相互调度和切换 非对称协程被调度协程只能将控制权返回给调度协程 非对称协程需要一个协程调度器类似池的概念，比较适合IO密集型；而对称协程适合计算密集型 协程实现三种方式： ucontex 通过是同ucontex函数族实现协程，struct ucontext中，设置uc_link指向恢复的上下文，uc_stack指向改协程使用的栈 getcontext()初始化，填充当前上下文 makecontext()设置协程执行函数，设置上下文 swapcontext()上下文切换，当前上下文保存到oucp，切换到ucp setcontext()慎用，直接跳到指定上下文，当前上下文就没有了 12345678910111213#include &lt;ucontext.h&gt;typedef struct ucontext &#123;   ...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#CAP%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">CAP：</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#raft"><span class="toc-number">2.</span> <span class="toc-text">raft</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%86%E5%AF%BC%E8%80%85%E9%80%89%E4%B8%BE"><span class="toc-number">2.1.</span> <span class="toc-text">领导者选举</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6"><span class="toc-number">2.2.</span> <span class="toc-text">日志复制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-number">2.3.</span> <span class="toc-text">安全性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E5%8E%8B%E7%BC%A9"><span class="toc-number">2.4.</span> <span class="toc-text">日志压缩</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E6%88%90%E5%91%98%E5%8F%98%E6%9B%B4"><span class="toc-number">2.5.</span> <span class="toc-text">集群成员变更</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BA%A4%E4%BA%92"><span class="toc-number">2.6.</span> <span class="toc-text">客户端交互</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%A7%E8%83%BD"><span class="toc-number">2.7.</span> <span class="toc-text">性能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#no-op"><span class="toc-number">2.8.</span> <span class="toc-text">no-op</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%8D%E5%88%B6%E7%8A%B6%E6%80%81%E6%9C%BA"><span class="toc-number">2.9.</span> <span class="toc-text">复制状态机</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Paxos%E6%AF%94%E8%BE%83"><span class="toc-number">3.</span> <span class="toc-text">Paxos比较</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E"><span class="toc-number">4.</span> <span class="toc-text">存储引擎</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#B%E6%A0%91"><span class="toc-number">4.1.</span> <span class="toc-text">B树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LSM%E6%A0%91"><span class="toc-number">4.2.</span> <span class="toc-text">LSM树</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Raft%E5%AE%9E%E7%8E%B0"><span class="toc-number">5.</span> <span class="toc-text">Raft实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#leader-election"><span class="toc-number">5.1.</span> <span class="toc-text">leader election</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#log-replication"><span class="toc-number">5.2.</span> <span class="toc-text">log replication</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-284"><span class="toc-number">6.</span> <span class="toc-text">6.284</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#MapReducec"><span class="toc-number">6.1.</span> <span class="toc-text">MapReducec</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">6.2.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GFS"><span class="toc-number">6.3.</span> <span class="toc-text">GFS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FT-VM"><span class="toc-number">6.4.</span> <span class="toc-text">FT VM</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AE%E8%AE%A4%E6%80%A7%E9%87%8D%E6%94%BE"><span class="toc-number">6.4.1.</span> <span class="toc-text">确认性重放</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#FT%E5%8D%8F%E8%AE%AE"><span class="toc-number">6.4.2.</span> <span class="toc-text">FT协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7"><span class="toc-number">6.5.</span> <span class="toc-text">一致性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#raft-1"><span class="toc-number">6.6.</span> <span class="toc-text">raft</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Zookeeper"><span class="toc-number">6.7.</span> <span class="toc-text">Zookeeper</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">6.7.1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#znode"><span class="toc-number">6.7.2.</span> <span class="toc-text">znode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#znode-%E8%83%BD%E5%B9%B2%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">6.7.3.</span> <span class="toc-text">znode 能干什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Watch-%E6%9C%BA%E5%88%B6%EF%BC%88%E4%BA%8B%E4%BB%B6%E8%A7%A6%E5%8F%91%E9%80%9A%E7%9F%A5%EF%BC%89"><span class="toc-number">6.7.4.</span> <span class="toc-text">Watch 机制（事件触发通知）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#API"><span class="toc-number">6.7.5.</span> <span class="toc-text">API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#zookeeper%E9%A1%BA%E5%BA%8F%E6%80%A7%E4%BF%9D%E8%AF%81"><span class="toc-number">6.7.6.</span> <span class="toc-text">zookeeper顺序性保证</span></a></li></ol></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Jerold</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
