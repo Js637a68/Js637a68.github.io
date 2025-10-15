@@ -1,0 +1,633 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>linux0.11 | Jerold‘s PNote</title><meta name="author" content="Jerold"><meta name="copyright" content="Jerold"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="第一部分：进入内核前的苦力活 第二部分：大战前期的初始化工作 第三部分：一个新进程的诞生 第四部分：shell 程序的到来 第五部分：从一个命令的执行看操作系统各模块的运作 第六部分：操作系统哲学与思想 开机主板上写死的BIOS程序将启动区（1扇区）的前512字节放到内存0x7c00中 0盘0道1扇区的最后两个字节为0x55和0xaa，就是启动区 这个启动区存储的就是用汇编写的bootsect.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux0.11">
+<meta property="og:url" content="http://example.com/linux0-11/index.html">
+<meta property="og:site_name" content="Jerold‘s PNote">
+<meta property="og:description" content="第一部分：进入内核前的苦力活 第二部分：大战前期的初始化工作 第三部分：一个新进程的诞生 第四部分：shell 程序的到来 第五部分：从一个命令的执行看操作系统各模块的运作 第六部分：操作系统哲学与思想 开机主板上写死的BIOS程序将启动区（1扇区）的前512字节放到内存0x7c00中 0盘0道1扇区的最后两个字节为0x55和0xaa，就是启动区 这个启动区存储的就是用汇编写的bootsect.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/covers/14.jpg">
+<meta property="article:published_time" content="2025-08-05T14:00:36.000Z">
+<meta property="article:modified_time" content="2025-08-05T14:00:36.000Z">
+<meta property="article:author" content="Jerold">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/covers/14.jpg"><link rel="shortcut icon" href="/img/logo.jpg"><link rel="canonical" href="http://example.com/linux0-11/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const hour = new Date().getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (theme === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else theme === 'light' ? activateLightMode() : activateDarkMode()
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'linux0.11',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  isShuoshuo: false
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bg2.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">39</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/14.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Jerold‘s PNote</span></a><a class="nav-page-title" href="/"><span class="site-name">linux0.11</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">linux0.11</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-08-05T14:00:36.000Z" title="发表于 2025-08-05 2025-08-05T22:00:36+08:00">2025-08-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-08-05T14:00:36.000Z" title="更新于 2025-08-05 2025-08-05T22:00:36+08:00">2025-08-05</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><hr>
+<p>第一部分：进入内核前的苦力活</p>
+<p>第二部分：大战前期的初始化工作</p>
+<p>第三部分：一个新进程的诞生</p>
+<p>第四部分：shell 程序的到来</p>
+<p>第五部分：从一个命令的执行看操作系统各模块的运作</p>
+<p>第六部分：操作系统哲学与思想</p>
+<h3 id="开机"><a href="#开机" class="headerlink" title="开机"></a>开机</h3><p>主板上写死的BIOS程序将启动区（1扇区）的前512字节放到内存0x7c00中</p>
+<p>0盘0道1扇区的最后两个字节为0x55和0xaa，就是启动区</p>
+<p>这个启动区存储的就是用汇编写的bootsect.s通过编译的bootsect二进制文件</p>
+<blockquote>
+<p>BIOS干两件事：1、加载内存；2、跳转到该内存地址</p>
+</blockquote>
+<h3 id="bootsect"><a href="#bootsect" class="headerlink" title="bootsect"></a>bootsect</h3><p><strong>把内核搬到内存</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mov ax,0x07c0</span><br><span class="line">mov ds,ax</span><br></pre></td></tr></table></figure>
+
+<p>设置段基地址，早期8086总线20位，物理地址有20位，但是寄存器只有16位，为了使用完物理地址，使用分段存储</p>
+<p>物理地址 &#x3D; 段基址 &lt;&lt; 4 + 偏移地址，这样就能表示所有内存了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mov ax,0x9000</span><br><span class="line">mov es,ax</span><br><span class="line">mov cx,#256</span><br><span class="line">sub si,si</span><br><span class="line">sub di,di</span><br><span class="line">rep movw</span><br></pre></td></tr></table></figure>
+
+<p>从ds:si复制256字到es:di，现在512字节的启动区被复制到0x90000地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">go: mov ax,cs</span><br><span class="line">    mov ds,ax</span><br><span class="line">    mov es,ax</span><br><span class="line">    mov ss,ax</span><br><span class="line">    mov sp,#0xFF00</span><br></pre></td></tr></table></figure>
+
+<p>然后将go标签所在的地址给ds数据段，es扩展段、ss栈段，同时设置sp栈顶，初步规划号内存地址</p>
+<p>紧接着到load_setup标签处，发起0x13中断，将第二个扇区开始的4个扇区加载到0x90200，内容是setup程序</p>
+<p>接着后把第6个扇区开始的240个扇区加载到0x10000，内容是操作系统其他代码system</p>
+<h3 id="setup"><a href="#setup" class="headerlink" title="setup"></a>setup</h3><p>CPU跳转到0x90200来执行setup</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">start:</span><br><span class="line">    mov ax,#0x9000  ; this is done in bootsect already, but...</span><br><span class="line">    mov ds,ax</span><br><span class="line">    mov ah,#0x03    ; read cursor pos</span><br><span class="line">    xor bh,bh</span><br><span class="line">    int 0x10        ; save it in known place, con_init fetches</span><br><span class="line">    mov [0],dx      ; it from 0x90000.</span><br></pre></td></tr></table></figure>
+
+<p>然后设置ah寄存器为0x03并触发int 0x10中断，这两步的作用来读取光标位置，并将光标位置存在dx中（dh存行号，dl存列号）</p>
+<p>除此之外，以相同的步骤读取内存信息，显卡信息，磁盘信息等，</p>
+<blockquote>
+<p>约定用0x90000起的内存来存取这些信息，这样就方便了双方对数据的存取，而不需要变量</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>内存地址</th>
+<th>长度(字节)</th>
+<th>名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0x90000</td>
+<td>2</td>
+<td>光标位置</td>
+</tr>
+<tr>
+<td>0x90002</td>
+<td>2</td>
+<td>扩展内存数</td>
+</tr>
+<tr>
+<td>0x90004</td>
+<td>2</td>
+<td>显示页面</td>
+</tr>
+<tr>
+<td>0x90006</td>
+<td>1</td>
+<td>显示模式</td>
+</tr>
+<tr>
+<td>0x90007</td>
+<td>1</td>
+<td>字符列数</td>
+</tr>
+<tr>
+<td>0x90008</td>
+<td>2</td>
+<td>未知</td>
+</tr>
+<tr>
+<td>0x9000A</td>
+<td>1</td>
+<td>显示内存</td>
+</tr>
+<tr>
+<td>0x9000B</td>
+<td>1</td>
+<td>显示状态</td>
+</tr>
+<tr>
+<td>0x9000C</td>
+<td>2</td>
+<td>显卡特性参数</td>
+</tr>
+<tr>
+<td>0x9000E</td>
+<td>1</td>
+<td>屏幕行数</td>
+</tr>
+<tr>
+<td>0x9000F</td>
+<td>1</td>
+<td>屏幕列数</td>
+</tr>
+<tr>
+<td>0x90080</td>
+<td>16</td>
+<td>硬盘1参数表</td>
+</tr>
+<tr>
+<td>0x90090</td>
+<td>16</td>
+<td>硬盘2参数表</td>
+</tr>
+<tr>
+<td>0x901FC</td>
+<td>2</td>
+<td>根设备号</td>
+</tr>
+</tbody></table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cli         ; no interrupts allowed ;</span><br></pre></td></tr></table></figure>
+
+<p>此时关闭中断，把BIOS写的中断向量给覆盖掉</p>
+<p>接着把system部分内存复制到0地址，这样0-0x80000这些内存就是操作系统剩下的所有代码了，而0x90000的bootsect也被覆盖了一些变量信息</p>
+<hr>
+<p><strong>保护模式</strong>——16位实模式到32位保护模式转换</p>
+<p>区别：实模式下<strong>段寄存器</strong>（ds、cs、es）存放基地址，保护模式下段寄存器存放<strong>段选择子</strong>，通过gdtr去找到gdt，段选择子包含<strong>段描述符索引</strong>，找到段描述符才找到基地址，用这个基地址+偏移地址&#x3D;物理地址（仅段机制没开启分页机制）</p>
+<img src="C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250807233210491.png" alt="image-20250807233210491" style="zoom: 67%;" />
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">lidt  idt_48      ; load idt with 0,0</span><br><span class="line">lgdt  gdt_48      ; load gdt with whatever appropriate</span><br><span class="line"></span><br><span class="line">idt_48:</span><br><span class="line">    .word   0     ; idt limit=0</span><br><span class="line">    .word   0,0   ; idt base=0L</span><br><span class="line">    </span><br><span class="line">gdt_48:</span><br><span class="line">    .word   0x800       ; gdt limit=2048, 256 GDT entries</span><br><span class="line">    .word   512+gdt,0x9 ; gdt base = 0X9xxxx</span><br></pre></td></tr></table></figure>
+
+<p>从这里看到idtr和gdtr存放这48位，看gdt低16位是gdt的大小，限制2048字节，每个描述符8个字节，有256个描述符；高32位是gdt的偏移地址+0x90200（setup的地址）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">gdt:</span><br><span class="line">    .word   0,0,0,0     ; dummy</span><br><span class="line"></span><br><span class="line">    .word   0x07FF      ; 8Mb - limit=2047 (2048*4096=8Mb)</span><br><span class="line">    .word   0x0000      ; base address=0</span><br><span class="line">    .word   0x9A00      ; code read/exec</span><br><span class="line">    .word   0x00C0      ; granularity=4096, 386</span><br><span class="line"></span><br><span class="line">    .word   0x07FF      ; 8Mb - limit=2047 (2048*4096=8Mb)</span><br><span class="line">    .word   0x0000      ; base address=0</span><br><span class="line">    .word   0x9200      ; data read/write</span><br><span class="line">    .word   0x00C0      ; granularity=4096, 386</span><br></pre></td></tr></table></figure>
+
+<p>这段代码描述了gdt的具体内容，第0个描述符位为空；第1个第2个为代码段数据段，他们的基地址都为0，这样逻辑地址&#x3D;物理地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov ax,#0x0001  ; protected mode (PE) bit</span><br><span class="line">lmsw ax      ; This is it;</span><br><span class="line">jmpi 0,8     ; jmp offset 0 of segment 8 (cs)</span><br></pre></td></tr></table></figure>
+
+<p>前面省略打开A20地址线，重写中断号的代码，这里lmsw把<strong>cr0寄存器</strong>位0（就是PE）置1，这样就进入保护模式了，同时这里的jmpi跳转指cs+ip，0是偏移地址，8是cs的值1000（因为段寄存器是16位，段选择子高13位为描述符索引+TI+两位RPL），这样去gdt找到第一个描述符即代码段，基地址为0，CPU跳转到0物理地址，刚好是system程序，执行内核代码</p>
+<blockquote>
+<p>cr0寄存器控制着CPU的一些重要特性，主要位PE，PG允许分页，WP写保护</p>
+<p>cr2页故障线性地址寄存器，存放最后一次出现页故障的线性地址</p>
+<p>cr3页目录基地址寄存器，存放页目录表的物理地址，按照页大小4k对齐，因此低12位位0</p>
+</blockquote>
+<img src="/C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250808000307855.png" alt="image-20250808000307855" style="zoom:67%;" />
+
+<hr>
+<h3 id="system"><a href="#system" class="headerlink" title="system"></a>system</h3><p><strong>head.s</strong>———分页</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">_pg_dir:</span><br><span class="line">_startup_32:</span><br><span class="line">    mov eax,0x10</span><br><span class="line">    mov ds,ax</span><br><span class="line">    mov es,ax</span><br><span class="line">    mov fs,ax</span><br><span class="line">    mov gs,ax</span><br><span class="line">    lss esp,_stack_start</span><br></pre></td></tr></table></figure>
+
+<p><strong>_pg_dir</strong>这个标签就是实际页目录，也就是开启分页机制后，页目录覆盖这里；通上面cs为8一样，这些段寄存器都设置为10000，会去找gdt第二个段描述符，也就是数据段，同样是0的物理地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">long user_stack[4096 &gt;&gt; 2];</span><br><span class="line"></span><br><span class="line">struct</span><br><span class="line">&#123;</span><br><span class="line">  long *a;</span><br><span class="line">  short b;</span><br><span class="line">&#125;</span><br><span class="line">stack_start = &#123;&amp;user_stack[4096 &gt;&gt; 2], 0x10&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这个是stack_start的结构，lss esp将ss:esp指向stack_start，栈段寄存器依然是0x10，栈顶指针指向user_stack的最后一个元素，也就是这个栈应该是内核栈，并且大小应该有4096字节</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">call setup_idt ;设置中断描述符表</span><br><span class="line">call setup_gdt ;设置全局描述符表</span><br><span class="line">mov eax,10h</span><br><span class="line">mov ds,ax</span><br><span class="line">mov es,ax</span><br><span class="line">mov fs,ax</span><br><span class="line">mov gs,ax</span><br><span class="line">lss esp,_stack_start</span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">setup_idt:</span><br><span class="line">    lea edx,ignore_int</span><br><span class="line">    mov eax,00080000h</span><br><span class="line">    mov ax,dx</span><br><span class="line">    mov dx,8E00h</span><br><span class="line">    lea edi,_idt</span><br><span class="line">    mov ecx,256</span><br><span class="line">rp_sidt:</span><br><span class="line">    mov [edi],eax</span><br><span class="line">    mov [edi+4],edx</span><br><span class="line">    add edi,8</span><br><span class="line">    dec ecx</span><br><span class="line">    jne rp_sidt</span><br><span class="line">    lidt fword ptr idt_descr</span><br><span class="line">    ret</span><br><span class="line"></span><br><span class="line">idt_descr:</span><br><span class="line">    dw 256*8-1</span><br><span class="line">    dd _idt</span><br><span class="line"></span><br><span class="line">_idt:</span><br><span class="line">    DQ 256 dup(0)</span><br></pre></td></tr></table></figure>
+
+<p>接着又做了两件事：1、重新设置idt和gdt，call两个函数，然后又刷新了段寄存器；2、重定向idtr和gdtr</p>
+<blockquote>
+<p>这里相当于初始化中断描述符表，使其每个中断描述符的函数地址都指向<strong>ignore_int</strong> 这个默认函数，相当于你点击鼠标键盘不响应；重定向是这段代码在是system的head.s，_idt是中断描述符的内存地址，这个标签是在head.s设置的，这之前的地址在0x90200中的setup。</p>
+<p>内核程序都在0地址开始的system中，后面0x90200的setup程序没用了就给覆盖了</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jmp after_page_tables</span><br><span class="line">...</span><br><span class="line">after_page_tables:</span><br><span class="line">    push 0</span><br><span class="line">    push 0</span><br><span class="line">    push 0</span><br><span class="line">    push L6</span><br><span class="line">    push _main</span><br><span class="line">    jmp setup_paging</span><br><span class="line">L6:</span><br><span class="line">    jmp L6</span><br></pre></td></tr></table></figure>
+
+<p>这一步就开启分页机制，并且将将下一条命令地址也就是main函数压栈了，这样子当setup_paging函数调用后ret后就会去找栈顶元素，于是进入main函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">setup_paging:</span><br><span class="line">    mov ecx,1024*5</span><br><span class="line">    xor eax,eax</span><br><span class="line">    xor edi,edi</span><br><span class="line">    pushf</span><br><span class="line">    cld</span><br><span class="line">    rep stosd</span><br><span class="line">    mov eax,_pg_dir</span><br><span class="line">    mov [eax],pg0+7</span><br><span class="line">    mov [eax+4],pg1+7</span><br><span class="line">    mov [eax+8],pg2+7</span><br><span class="line">    mov [eax+12],pg3+7</span><br><span class="line">    mov edi,pg3+4092  ; EDI = 0x4000 + 4092 = 0x4FFC (pg3的末尾)</span><br><span class="line">	mov eax,00FFF007h ; 初始值：物理页帧0xFFF000，属性=7</span><br><span class="line">	std               ; 设置方向标志（递减）</span><br><span class="line">L3:</span><br><span class="line">    stosd         ; [EDI] = EAX, EDI -= 4</span><br><span class="line">    sub eax,00001000h ; 页帧号减1 (0x1000 = 4096)</span><br><span class="line">    jge L3        ; 如果EAX&gt;=0则继续</span><br><span class="line">    popf</span><br><span class="line">    xor eax,eax</span><br><span class="line">    mov cr3,eax</span><br><span class="line">    mov eax,cr0</span><br><span class="line">    or  eax,80000000h</span><br><span class="line">    mov cr0,eax</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
+
+<p>在setup_paging这个标签中，为分页机制做了这些事：</p>
+<p>1、将页目录表放在0地址，这样推测之前_pg_dir标签指向的地址就是0地址，因为这里被页目录覆盖了；</p>
+<p>2、设置4页页表放在页目录表后面，内存布局就变成这样了：</p>
+<p>| 地址范围      | 内容          | 大小   |</p>
+<p>|————–|————–|——–|</p>
+<p>| 0x0000       | 页目录表      | 4KB    |</p>
+<p>| 0x1000       | <strong>pg0</strong> (页表0)| 4KB    |</p>
+<p>| 0x2000       | <strong>pg1</strong> (页表1)| 4KB    |</p>
+<p>| 0x3000       | <strong>pg2</strong> (页表2)| 4KB    |</p>
+<p>| 0x4000       | <strong>pg3</strong> (页表3)| 4KB    |</p>
+<p>| 0x5000       | 其他数据       | N&#x2F;A    |</p>
+<p>3、清零页目录和页表，这里rep stosd将五个页表全部清零了</p>
+<p>4、初始化页目录项PDE，只有四个页表，设置属性0111</p>
+<ul>
+<li><code>P=1</code>：存在 (Present)</li>
+<li><code>RW=1</code>：可读写 (Read&#x2F;Write)</li>
+<li><code>US=1</code>：用户&#x2F;超级用户 (User&#x2F;Supervisor)</li>
+</ul>
+<img src="C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250810171916951.png" alt="image-20250810171916951" style="zoom:67%;" />
+
+<p>5、<strong>L3标签初始化页表项PTE，建立恒等式：</strong>从0x4FFC也就是最后一个PTE开始，往前循环每一个PTE，并且进行填充，以建立恒等式：</p>
+<p>最开始0x4FFC这个PTE填充为00FFF007h，也就是1111 1111 1111 0000 0000 0111，11找到pg3，10个1找到第1023个PTE，此时取出来的基地址也是1111 1111 1111 0000 0000 0000，这样就建立关系：<strong>线性地址&#x3D;&#x3D;转换后的物理地址</strong>；接着PTE减4变成0x4FF8，中间10位减1变成1111 1111 1110 0000 0000 0111，继续填充，直到0x1000填充了0000 0000 0000 0000 0000 0111</p>
+<p><strong>目的：</strong>因为一旦mov cr3,eax马上就开启分页转换，为了当前地址仍然能正确运行，于是建立恒等关系。这样cr3，jmp和ret返回main就是正确有效的地址</p>
+<p><strong>映射关系</strong>：</p>
+<ul>
+<li>线性地址 0x00000000 → 物理地址 0x00000000</li>
+<li>线性地址 0x00001000 → 物理地址 0x00001000</li>
+<li>…</li>
+<li>线性地址 0x00FFFFFF → 物理地址 0x00FFFFFF</li>
+</ul>
+<p>6、CPU开启分页机制，之前设置cr0时为了开启保护模式，现在设置cr0最高位开启分页机制，这样子之前经过分段转换的地址变成<strong>线性地址</strong>，CPU看到这个地址后拆分为 ——高10位：中间10位，低12位，由CPU里的MMU来将地址转换：因为一个页表1024个项，刚好需要10位，从PDE找到PTE，再从PTE找到基地址，最后加上12位偏移地址构成物理地址；这样一种方案叫二级页表方案；</p>
+<p>7、将页目录表地址放到cr3中</p>
+<blockquote>
+<p>为什么是4个页表？</p>
+<p>0.11时认为内存16MB，最大地址空间也就是0xFFFFFF；一个页大小4k(12)，一个页表项为4字节，这样一个页最多放1024个页表项，即一个页表存放1024*4k&#x3D;4MB，16MB需要4个页表</p>
+</blockquote>
+<hr>
+<h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">void main(void) &#123;</span><br><span class="line">    ROOT_DEV = ORIG_ROOT_DEV;</span><br><span class="line">    drive_info = DRIVE_INFO;</span><br><span class="line">    memory_end = (1&lt;&lt;20) + (EXT_MEM_K&lt;&lt;10);</span><br><span class="line">    memory_end &amp;= 0xfffff000;</span><br><span class="line">    if (memory_end &gt; 16*1024*1024)</span><br><span class="line">        memory_end = 16*1024*1024;</span><br><span class="line">    if (memory_end &gt; 12*1024*1024) </span><br><span class="line">        buffer_memory_end = 4*1024*1024;</span><br><span class="line">    else if (memory_end &gt; 6*1024*1024)</span><br><span class="line">        buffer_memory_end = 2*1024*1024;</span><br><span class="line">    else</span><br><span class="line">        buffer_memory_end = 1*1024*1024;</span><br><span class="line">    main_memory_start = buffer_memory_end;</span><br><span class="line"></span><br><span class="line">    mem_init(main_memory_start,memory_end);</span><br><span class="line">    trap_init();</span><br><span class="line">    blk_dev_init();</span><br><span class="line">    chr_dev_init();</span><br><span class="line">    tty_init();</span><br><span class="line">    time_init();</span><br><span class="line">    sched_init();</span><br><span class="line">    buffer_init(buffer_memory_end);</span><br><span class="line">    hd_init();</span><br><span class="line">    floppy_init();</span><br><span class="line"></span><br><span class="line">    sti();</span><br><span class="line">    move_to_user_mode();</span><br><span class="line">    if (!fork()) &#123;</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    for(;;) pause();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>main函数做了这些事：</p>
+<h4 id="1、保存设备信息"><a href="#1、保存设备信息" class="headerlink" title="1、保存设备信息"></a>1、保存设备信息</h4><p>这些信息在setup程序保存在0x90000地址；</p>
+<h4 id="2、主存初始化"><a href="#2、主存初始化" class="headerlink" title="2、主存初始化"></a>2、主存初始化</h4><p>之前说linux0.11内存为16MB，1MB用来放内核代码，剩下15MB分成多个4k页，用mem_map这张表来管理这15MB</p>
+<p>| 地址范围      | 内容          | 值   |</p>
+<p>|————–|————–|——–|</p>
+<p>| 2MB       |memory     | 0       |</p>
+<p>| 1MB       | buffer        | USED |</p>
+<p>|0               | 内核          |           |  </p>
+<p>当我们要申请内存时，比如fork进程，就需要**get_free_page()**来申请一页内存来存储task_struct，这张表对应的值变为100（USED）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">#define LOW_MEM 0x100000</span><br><span class="line">#define PAGING_MEMORY (15*1024*1024)</span><br><span class="line">#define PAGING_PAGES (PAGING_MEMORY&gt;&gt;12)</span><br><span class="line">#define MAP_NR(addr) (((addr)-LOW_MEM)&gt;&gt;12)</span><br><span class="line">#define USED 100</span><br><span class="line"></span><br><span class="line">static long HIGH_MEMORY = 0;</span><br><span class="line">static unsigned char mem_map[PAGING_PAGES] = &#123; 0, &#125;;</span><br><span class="line"></span><br><span class="line">// start_mem = 2 * 1024 * 1024</span><br><span class="line">// end_mem = 8 * 1024 * 1024</span><br><span class="line">void mem_init(long start_mem, long end_mem)</span><br><span class="line">&#123;</span><br><span class="line">    int i;</span><br><span class="line">    HIGH_MEMORY = end_mem;</span><br><span class="line">    for (i=0 ; i&lt;PAGING_PAGES ; i++)</span><br><span class="line">        mem_map[i] = USED;</span><br><span class="line">    i = MAP_NR(start_mem);</span><br><span class="line">    end_mem -= start_mem;</span><br><span class="line">    end_mem &gt;&gt;= 12;</span><br><span class="line">    while (end_mem--&gt;0)</span><br><span class="line">        mem_map[i++]=0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3、各个模块的初始化："><a href="#3、各个模块的初始化：" class="headerlink" title="3、各个模块的初始化："></a>3、各个模块的初始化：</h4><h5 id="中断初始化："><a href="#中断初始化：" class="headerlink" title="中断初始化："></a><strong>中断初始化：</strong></h5><p>之前中断描述符都初始化为ignore_int函数，现在设置具体正确的函数，设置许trap_gate和system_gate，这样我们的鼠标键盘就有中断函数了。他们两者区别是DPL（描述特权级）不一样，trap明显进入内核。键盘的中断函数其实路径是这样的：tty_init()——&gt;con_init()——&gt;set_trap_gate(0x21,&amp;keyboard_interrupt)；最后**sti()**开启中断键盘鼠标就有响应了</p>
+<hr>
+<h5 id="块设备初始化——读硬盘"><a href="#块设备初始化——读硬盘" class="headerlink" title="块设备初始化——读硬盘"></a><strong>块设备初始化——读硬盘</strong></h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">struct request &#123;</span><br><span class="line">    int dev;        /* -1 if no request */</span><br><span class="line">    int cmd;        /* READ or WRITE */</span><br><span class="line">    int errors;</span><br><span class="line">    unsigned long sector;</span><br><span class="line">    unsigned long nr_sectors;</span><br><span class="line">    char * buffer;</span><br><span class="line">    struct task_struct * waiting;</span><br><span class="line">    struct buffer_head * bh;</span><br><span class="line">    struct request * next;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>先给块设备请求项数组的前32个dev&#x3D;-1， next&#x3D;NULL；这样一个请求项就能描述一次读取硬盘的操作了：从哪块扇区读到哪块缓存</p>
+<p>多个请求项通过next连成链表，内核逐个处理</p>
+<ul>
+<li>具体例子：sys_read</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">int sys_read(unsigned int fd,char * buf,int count) &#123;</span><br><span class="line">    struct file * file = current-&gt;filp[fd];</span><br><span class="line">    struct m_inode * inode = file-&gt;f_inode;</span><br><span class="line">    // 校验 buf 区域的内存限制</span><br><span class="line">    verify_area(buf,count);</span><br><span class="line">    // 仅关注目录文件或普通文件</span><br><span class="line">    return file_read(inode,file,buf,count);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int file_read(struct m_inode * inode, struct file * filp, char * buf, int count) &#123;</span><br><span class="line">    int left,chars,nr;</span><br><span class="line">    struct buffer_head * bh;</span><br><span class="line">    left = count;</span><br><span class="line">    while (left) &#123;</span><br><span class="line">        if (nr = bmap(inode,(filp-&gt;f_pos)/BLOCK_SIZE)) &#123;</span><br><span class="line">            if (!(bh=bread(inode-&gt;i_dev,nr)))</span><br><span class="line">                break;</span><br><span class="line">        &#125; else</span><br><span class="line">            bh = NULL;</span><br><span class="line">        nr = filp-&gt;f_pos % BLOCK_SIZE;</span><br><span class="line">        chars = MIN( BLOCK_SIZE-nr , left );</span><br><span class="line">        filp-&gt;f_pos += chars;</span><br><span class="line">        left -= chars;</span><br><span class="line">        if (bh) &#123;</span><br><span class="line">            char * p = nr + bh-&gt;b_data;</span><br><span class="line">            while (chars--&gt;0)</span><br><span class="line">                put_fs_byte(*(p++),buf++);</span><br><span class="line">            brelse(bh);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            while (chars--&gt;0)</span><br><span class="line">                put_fs_byte(0,buf++);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    inode-&gt;i_atime = CURRENT_TIME;</span><br><span class="line">    return (count-left)?(count-left):-ERROR;</span><br></pre></td></tr></table></figure>
+
+<p>读取一个文件描述符，最终落实到这个文件inode去读取磁盘块，函数调用链：bread——&gt;ll_rw_block——&gt;make_request——&gt;add_request</p>
+<img src="/C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250813232455669.png" alt="image-20250813232455669" style="zoom:50%;" />
+
+<h5 id="控制台初始化——键盘输出"><a href="#控制台初始化——键盘输出" class="headerlink" title="控制台初始化——键盘输出"></a><strong>控制台初始化</strong>——键盘输出</h5><p>在内存有一段区域——跟显存映射的：这块区域用两个字节表示一个显示在屏幕上的字符(编码和颜色)；</p>
+<p>tty_init()包含rs_init()和con_init()这两个函数：第一个函数开启串口中断、设置中断函数；第二个函数做了几件事：</p>
+<p>1、获取显存相关信息：之前在0x90000地址存放了信息，包含了屏幕显示(显示模式、字符列数、行数、列数等)，获取 0x90006 地址处的数据</p>
+<p>2、显存映射：比如在CGA文本模式，映射的内存是从 0xB8000 到 0xBA000。例如以下这段代码在左上角打印了hello</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov [0xB8000],&#x27;h&#x27;</span><br><span class="line">mov [0xB8002],&#x27;e&#x27;</span><br><span class="line">mov [0xB8004],&#x27;l&#x27;</span><br><span class="line">mov [0xB8006],&#x27;l&#x27;</span><br><span class="line">mov [0xB8008],&#x27;o&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>3、设置滚动屏幕时的参数，定义首行和末行，这样滚动的时候就可以上移</p>
+<p>4、把光标定位到之前保存的光标位置处（取内存地址 0x90000 处的数据），然后设置并开启键盘中断。然后通过x列，y行，向pos指向的地址写入数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">static inline void gotoxy(unsigned int new_x,unsigned int new_y) &#123;</span><br><span class="line">   ...</span><br><span class="line">   x = new_x;</span><br><span class="line">   y = new_y;</span><br><span class="line">   pos = origin + y*video_size_row + (x&lt;&lt;1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>于是按下键盘后，一个键盘中断产生：<strong>归根到底：各种换行、删除、回车等操作本质都是对内存操作</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">_keyboard_interrupt:</span><br><span class="line">    ...</span><br><span class="line">    call _do_tty_interrupt</span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">void do_tty_interrupt(int tty) &#123;</span><br><span class="line">   copy_to_cooked(tty_table+tty);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void copy_to_cooked(struct tty_struct * tty) &#123;</span><br><span class="line">    ...</span><br><span class="line">    tty-&gt;write(tty);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 控制台时 tty 的 write 为 con_write 函数</span><br><span class="line">void con_write(struct tty_struct * tty) &#123;</span><br><span class="line">    ...</span><br><span class="line">    __asm__(&quot;movb _attr,%%ah\n\t&quot;</span><br><span class="line">      &quot;movw %%ax,%1\n\t&quot;</span><br><span class="line">      ::&quot;a&quot; (c),&quot;m&quot; (*(short *)pos)</span><br><span class="line">      :&quot;ax&quot;);</span><br><span class="line">     pos += 2;</span><br><span class="line">     x++;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="时间初始化——获取当前时间"><a href="#时间初始化——获取当前时间" class="headerlink" title="时间初始化——获取当前时间"></a><strong>时间初始化</strong>——获取当前时间</h5><p>如何获取时间，主要做两件事：1、从CMOS这个设备读取；2、将读取的BCD编码转换为二进制存储</p>
+<p>与CMOS打交道则是通过端口的进行in，out的，这些端口号大部分连接寄存器，如数据寄存器、命令寄存器等</p>
+<h5 id="进程调度初始化"><a href="#进程调度初始化" class="headerlink" title="进程调度初始化"></a><strong>进程调度初始化</strong></h5><p>shed_init用到两个关键的结构：<strong>TSS</strong> 和 <strong>LDT</strong></p>
+<p>在gdt中，已经存储了四个段描述符了：0、code、data、0。接下来又往后加了两项，TSS和LDT</p>
+<p>TSS：任务状态段，用来保存和恢复进程的上下文</p>
+<p>LDT：局部描述符表，用来保存每个进程的代码段、数据段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">struct tss_struct&#123;</span><br><span class="line">    long back_link;</span><br><span class="line">    long esp0;</span><br><span class="line">    long ss0;</span><br><span class="line">    long esp1;</span><br><span class="line">    long ss1;</span><br><span class="line">    long esp2;</span><br><span class="line">    long ss2;</span><br><span class="line">    long cr3;</span><br><span class="line">    long eip;</span><br><span class="line">    long eflags;</span><br><span class="line">    long eax, ecx, edx, ebx;</span><br><span class="line">    long esp;</span><br><span class="line">    long ebp;</span><br><span class="line">    long esi;</span><br><span class="line">    long edi;</span><br><span class="line">    long es;</span><br><span class="line">    long cs;</span><br><span class="line">    long ss;</span><br><span class="line">    long ds;</span><br><span class="line">    long fs;</span><br><span class="line">    long gs;</span><br><span class="line">    long ldt;</span><br><span class="line">    long trace_bitmap;</span><br><span class="line">    struct i387_struct i387;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>1、给task（64个task_struct结构）缺省值的，并且给gdt剩余的位置填充为0，往后每添加一个进程就添加一组TSS和LDT</p>
+<blockquote>
+<p>当前task[0]不是init进程，而是idle进程：main函数这些初始化的指令流可以说是内核镜像的一部分，此时没有进程上下文，而后调度器初始化并且启动后执行的第一个任务就是最后一段代码的for循环，进行空闲循环，这个代码才是进程0的，可以说tss0为内核执行提供了环境，派生了后续的init和其他内核线程</p>
+</blockquote>
+<p>2、0TSS和0LDT是为当前运行的代码的<strong>一个指令流</strong>，当调度机制建立后就会成为进程0；除此之外gdt有gdtr，代码段数据段都有段寄存器保存地址，TSS和LDT也有tr寄存器和ldt寄存器用来保存这两个段描述符的地址，当进程切换时，这些寄存器也要保存</p>
+<p>3、真正的进程调度主要靠时钟中断和调度算法来实现，后面的代码则是通过outb_p与<strong>可编程定时器芯片</strong>的端口交互，开启定时器，设置中断函数，允许中断，开启了定时中断，在这里设置0x21和0x80两个非常重要的中断，<strong>时钟中断和系统调用中断</strong></p>
+<pre><code>outb_p(0x36,0x43);      /* binary, mode 3, LSB/MSB, ch 0 */
+outb_p(LATCH &amp; 0xff , 0x40);    /* LSB */
+outb(LATCH &gt;&gt; 8 , 0x40);    /* MSB */
+set_intr_gate(0x20,&amp;timer_interrupt);
+outb(inb_p(0x21)&amp;~0x01,0x21);
+set_system_gate(0x80,&amp;system_call);
+</code></pre>
+<p><strong>task_struct</strong>：进程结构的具体信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">struct task_struct &#123;</span><br><span class="line">/* these are hardcoded - don&#x27;t touch */</span><br><span class="line">    long state; /* -1 unrunnable, 0 runnable, &gt;0 stopped */</span><br><span class="line">    long counter;</span><br><span class="line">    long priority;</span><br><span class="line">    long signal;</span><br><span class="line">    struct sigaction sigaction[32];</span><br><span class="line">    long blocked; /* bitmap of masked signals */</span><br><span class="line">  /* various fields */</span><br><span class="line">    int exit_code;</span><br><span class="line">    unsigned long start_code,end_code,end_data,brk,start_stack;</span><br><span class="line">    long pid,father,pgrp,session,leader;</span><br><span class="line">    unsigned short uid,euid,suid;</span><br><span class="line">    unsigned short gid,egid,sgid;</span><br><span class="line">    long alarm;</span><br><span class="line">    long utime,stime,cutime,cstime,start_time;</span><br><span class="line">    unsigned short used_math;</span><br><span class="line">  /* file system info */</span><br><span class="line">    int tty;  /* -1 if no tty, so it must be signed */</span><br><span class="line">    unsigned short umask;</span><br><span class="line">    struct m_inode * pwd;</span><br><span class="line">    struct m_inode * root;</span><br><span class="line">    struct m_inode * executable;</span><br><span class="line">    unsigned long close_on_exec;</span><br><span class="line">    struct file * filp[NR_OPEN];</span><br><span class="line">  /* ldt for this task 0 - zero 1 - cs 2 - ds&amp;ss */</span><br><span class="line">    struct desc_struct ldt[3];</span><br><span class="line">  /* tss for this task */</span><br><span class="line">    struct tss_struct tss;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>进程创建</strong></p>
+<p>进程 0 创建进程 1 时，复制了 <strong>160</strong> 个页表项。进程 1 创建进程 2 时，复制了 <strong>1024</strong> 个页表项。之后进程 2 创建进程 3，进程 3 创建进程 4，通通都是复制 1024 个页表项。</p>
+<blockquote>
+<p>1、为进程设置页表和页表目录通过copy_mem函数来准备工作，根据父进程代码段数据段，设置子进程代码段数据段基地址</p>
+<p>2.设置idt的代码段数据段信息</p>
+<p>3、copy_page_tables复制页表，申请空间</p>
+<p>4、设置子进程页目录表，刷新页变换高速缓存</p>
+</blockquote>
+<img src="C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250817155949113.png" alt="image-20250817155949113" style="zoom:50%;" />
+
+
+
+<h5 id="缓存区初始化"><a href="#缓存区初始化" class="headerlink" title="缓存区初始化"></a>缓存区初始化</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">extern int end;</span><br><span class="line">struct buffer_head * start_buffer = (struct buffer_head *) &amp;end;</span><br><span class="line"></span><br><span class="line">void buffer_init(long buffer_end) &#123;</span><br><span class="line">    struct buffer_head * h = start_buffer;</span><br><span class="line">    void * b = (void *) buffer_end;</span><br><span class="line">    while ( (b -= 1024) &gt;= ((void *) (h+1)) ) &#123;</span><br><span class="line">        h-&gt;b_dev = 0;</span><br><span class="line">        h-&gt;b_dirt = 0;</span><br><span class="line">        h-&gt;b_count = 0;</span><br><span class="line">        h-&gt;b_lock = 0;</span><br><span class="line">        h-&gt;b_uptodate = 0;</span><br><span class="line">        h-&gt;b_wait = NULL;</span><br><span class="line">        h-&gt;b_next = NULL;</span><br><span class="line">        h-&gt;b_prev = NULL;</span><br><span class="line">        h-&gt;b_data = (char *) b;</span><br><span class="line">        h-&gt;b_prev_free = h-1;</span><br><span class="line">        h-&gt;b_next_free = h+1;</span><br><span class="line">        h++;</span><br><span class="line">    &#125;</span><br><span class="line">    h--;</span><br><span class="line">    free_list = start_buffer;</span><br><span class="line">    free_list-&gt;b_prev_free = h;</span><br><span class="line">    h-&gt;b_next_free = free_list;</span><br><span class="line">    for (int i=0;i&lt;307;i++)</span><br><span class="line">        hash_table[i]=NULL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>end是<strong>链接器 ld</strong> 在链接整个程序时设置的一个外部变量，帮我们计算好了整个内核代码的末尾地址</p>
+<p>这段代码以内存为8M为例子，在2M缓存区上方存放缓存块，下方存放缓存信息结构体，并且h-&gt;b_data &#x3D; (char*)b；最后组成双向链表free_list；</p>
+<p>后面hash_table进行块设备缓冲区的映射，读取块设备时需要读到缓冲区，如果已经读到了就进行映射，这样就不需要去遍历链表了，映射规则：(dev^block) mod 307</p>
+<h5 id="硬盘初始化"><a href="#硬盘初始化" class="headerlink" title="硬盘初始化"></a>硬盘初始化</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">//struct blk_dev_struct &#123;</span><br><span class="line">//    void (*request_fn)(void);</span><br><span class="line">//    struct request * current_request;</span><br><span class="line">//&#125;;</span><br><span class="line">//extern struct blk_dev_struct blk_dev[NR_BLK_DEV];</span><br><span class="line"></span><br><span class="line">void hd_init(void) &#123;</span><br><span class="line">    blk_dev[3].request_fn = do_hd_request;</span><br><span class="line">    set_intr_gate(0x2E,&amp;hd_interrupt);</span><br><span class="line">    outb_p(inb_p(0x21)&amp;0xfb,0x21);</span><br><span class="line">    outb(inb_p(0xA1)&amp;0xbf,0xA1); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct blk_dev_struct blk_dev[NR_BLK_DEV] = &#123;</span><br><span class="line">    &#123; NULL, NULL &#125;,     /* no_dev */</span><br><span class="line">    &#123; NULL, NULL &#125;,     /* dev mem */</span><br><span class="line">    &#123; NULL, NULL &#125;,     /* dev fd */</span><br><span class="line">    &#123; NULL, NULL &#125;,     /* dev hd */</span><br><span class="line">    &#123; NULL, NULL &#125;,     /* dev ttyx */</span><br><span class="line">    &#123; NULL, NULL &#125;,     /* dev tty */</span><br><span class="line">    &#123; NULL, NULL &#125;      /* dev lp */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>因为有很多块设备，所以 Linux 0.11 内核用了一个 <strong>blk_dev[]</strong> 来进行管理，每一个索引表示一个块设备。</p>
+<p>这里函数指针进行统一接口，多态</p>
+<p>硬盘的端口表。</p>
+<table>
+<thead>
+<tr>
+<th align="left">端口</th>
+<th align="left">读</th>
+<th align="left">写</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0x1F0</td>
+<td align="left">数据寄存器</td>
+<td align="left">数据寄存器</td>
+</tr>
+<tr>
+<td align="left">0x1F1</td>
+<td align="left">错误寄存器</td>
+<td align="left">特征寄存器</td>
+</tr>
+<tr>
+<td align="left">0x1F2</td>
+<td align="left">扇区计数寄存器</td>
+<td align="left">扇区计数寄存器</td>
+</tr>
+<tr>
+<td align="left">0x1F3</td>
+<td align="left">扇区号寄存器或 LBA 块地址 0~7</td>
+<td align="left">扇区号或 LBA 块地址 0~7</td>
+</tr>
+<tr>
+<td align="left">0x1F4</td>
+<td align="left">磁道数低 8 位或 LBA 块地址 8~15</td>
+<td align="left">磁道数低 8 位或 LBA 块地址 8~15</td>
+</tr>
+<tr>
+<td align="left">0x1F5</td>
+<td align="left">磁道数高 8 位或 LBA 块地址 16~23</td>
+<td align="left">磁道数高 8 位或 LBA 块地址 16~23</td>
+</tr>
+<tr>
+<td align="left">0x1F6</td>
+<td align="left">驱动器&#x2F;磁头或 LBA 块地址 24~27</td>
+<td align="left">驱动器&#x2F;磁头或 LBA 块地址 24~27</td>
+</tr>
+<tr>
+<td align="left">0x1F7</td>
+<td align="left">命令寄存器或状态寄存器</td>
+<td align="left">命令寄存器</td>
+</tr>
+</tbody></table>
+<p>那读硬盘就是，往除了第一个以外的后面几个端口写数据，告诉要读硬盘的哪个扇</p>
+<h3 id="4、切换用户模式"><a href="#4、切换用户模式" class="headerlink" title="4、切换用户模式"></a>4、切换用户模式</h3><p>内核态用户态本质是特权级的变化——属于段保护模式的一种</p>
+<p>我们执行的代码地址是通过CPU中的<strong>cs：eip</strong>指向的，cs存放段选自的CPL是<strong>当前特权级</strong>，当要跳转到其他段时，yyy地址的RPL是<strong>请求特权级</strong>，找到段描述符后，只有DPL目标特权级和CPL一致时，才不会报错</p>
+<p><strong>代码跳转只能同特权级，数据访问只能高特权级访问低特权级</strong></p>
+<img src="C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250818002905006.png" alt="image-20250818002905006" style="zoom:50%;" />
+
+<p><strong>跳转到用户态的操作：</strong></p>
+<p>代码模拟中断返回iret过程实现跳转，发生中断时，CPU会压栈保存上下文，发生特权级变换时压栈顺序：ss、esp、eflags、cs、eip、erro_code</p>
+<p>ss段选择子为1001，则说明会去gdt的数据段（因为TI为0），并且特权级为1（内核态）；</p>
+<p>cs为1111，则说明会去ldt的代码段（因为TI为1），并且特权级为3（内用户态），eip指向l1这个标签地址，即下一条执行地址</p>
+<p>所以iretd执行后，依然在内核栈，但接下来的代码指令已经到0LDT去执行了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#define move_to_user_mode() \</span><br><span class="line">_asm &#123; \</span><br><span class="line">    _asm mov eax,esp \</span><br><span class="line">    _asm push 00000017h \</span><br><span class="line">    _asm push eax \</span><br><span class="line">    _asm pushfd \</span><br><span class="line">    _asm push 0000000fh \</span><br><span class="line">    _asm push offset l1 \</span><br><span class="line">    _asm iretd /* 执行中断返回指令*/ \</span><br><span class="line">_asm l1: mov eax,17h \</span><br><span class="line">    _asm mov ds,ax \</span><br><span class="line">    _asm mov es,ax \</span><br><span class="line">    _asm mov fs,ax \</span><br><span class="line">    _asm mov gs,ax \</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5、init进程"><a href="#5、init进程" class="headerlink" title="5、init进程"></a>5、init进程</h3><p>准备工作：</p>
+<p>1、每次进程切换通过将上下文保存到tss中</p>
+<p>2、每次时钟中断将时间片减1，counter为0时执行schedule</p>
+<p>3、优先级</p>
+<p>4、进程状态</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">struct task_struct &#123;</span><br><span class="line">    long state; /* -1 unrunnable, 0 runnable, &gt;0 stopped */</span><br><span class="line">    long counter;</span><br><span class="line">    long priority;</span><br><span class="line">    ...</span><br><span class="line">    struct tss_struct tss;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#define TASK_RUNNING          0</span><br><span class="line">#define TASK_INTERRUPTIBLE    1</span><br><span class="line">#define TASK_UNINTERRUPTIBLE  2</span><br><span class="line">#define TASK_ZOMBIE           3</span><br><span class="line">#define TASK_STOPPED          4</span><br><span class="line"></span><br><span class="line">struct tss_struct &#123;</span><br><span class="line">    long    back_link;  /* 16 high bits zero */</span><br><span class="line">    long    esp0;</span><br><span class="line">    long    ss0;        /* 16 high bits zero */</span><br><span class="line">    long    esp1;</span><br><span class="line">    long    ss1;        /* 16 high bits zero */</span><br><span class="line">    long    esp2;</span><br><span class="line">    long    ss2;        /* 16 high bits zero */</span><br><span class="line">    long    cr3;</span><br><span class="line">    long    eip;</span><br><span class="line">    long    eflags;</span><br><span class="line">    long    eax,ecx,edx,ebx;</span><br><span class="line">    long    esp;</span><br><span class="line">    long    ebp;</span><br><span class="line">    long    esi;</span><br><span class="line">    long    edi;</span><br><span class="line">    long    es;     /* 16 high bits zero */</span><br><span class="line">    long    cs;     /* 16 high bits zero */</span><br><span class="line">    long    ss;     /* 16 high bits zero */</span><br><span class="line">    long    ds;     /* 16 high bits zero */</span><br><span class="line">    long    fs;     /* 16 high bits zero */</span><br><span class="line">    long    gs;     /* 16 high bits zero */</span><br><span class="line">    long    ldt;        /* 16 high bits zero */</span><br><span class="line">    long    trace_bitmap;   /* bits: trace 0, bitmap 16-31 */</span><br><span class="line">    struct i387_struct i387;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>进程的调度：</p>
+<p><strong>1.</strong> 拿到剩余时间片（counter的值）最大且在 runnable 状态（state &#x3D; 0）的进程号 next。</p>
+<p><strong>2.</strong> 如果所有 runnable 进程时间片都为 0，则将所有进程（注意不仅仅是 runnable 的进程）的 counter 重新赋值（counter &#x3D; counter&#x2F;2 + priority），然后再次执行步骤 1。</p>
+<p><strong>3.</strong> 最后拿到了一个进程号 next，调用了 switch_to(next) 这个方法，就切换到了这个进程去执行了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">sched.h</span><br><span class="line"></span><br><span class="line">#define switch_to(n) &#123;\</span><br><span class="line">struct &#123;long a,b;&#125; __tmp; \</span><br><span class="line">__asm__(&quot;cmpl %%ecx,_current\n\t&quot; \</span><br><span class="line">    &quot;je 1f\n\t&quot; \</span><br><span class="line">    &quot;movw %%dx,%1\n\t&quot; \</span><br><span class="line">    &quot;xchgl %%ecx,_current\n\t&quot; \</span><br><span class="line">    &quot;ljmp %0\n\t&quot; \</span><br><span class="line">    &quot;cmpl %%ecx,_last_task_used_math\n\t&quot; \</span><br><span class="line">    &quot;jne 1f\n\t&quot; \</span><br><span class="line">    &quot;clts\n&quot; \</span><br><span class="line">    &quot;1:&quot; \</span><br><span class="line">    ::&quot;m&quot; (*&amp;__tmp.a),&quot;m&quot; (*&amp;__tmp.b), \</span><br><span class="line">    &quot;d&quot; (_TSS(n)),&quot;c&quot; ((long) task[n])); \</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>fork进程创建：</strong></p>
+<p>#define __NR_fork 2，_到sys_call_table+8个字节的地方，即下标为2</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">static _inline _syscall0(int,fork)</span><br><span class="line"></span><br><span class="line">#define _syscall0(type,name) \</span><br><span class="line">type name(void) \</span><br><span class="line">&#123; \</span><br><span class="line">long __res; \</span><br><span class="line"></span><br><span class="line">__asm__ volatile (&quot;int $0x80&quot; \</span><br><span class="line">    : &quot;=a&quot; (__res) \</span><br><span class="line">    : &quot;0&quot; (__NR_##name)); \</span><br><span class="line">if (__res &gt;= 0) \</span><br><span class="line">    return (type) __res; \</span><br><span class="line">errno = -__res; \</span><br><span class="line">return -1; \</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>CPU 中断压入的 5 个值，加上 system_call 手动压入的 7 个值。具体说来有 <strong>ds、es、fs、edx、ecx、ebx、eax</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">_system_call:</span><br><span class="line">    cmpl $nr_system_calls-1,%eax</span><br><span class="line">    ja bad_sys_call</span><br><span class="line">    push %ds</span><br><span class="line">    push %es</span><br><span class="line">    push %fs</span><br><span class="line">    pushl %edx</span><br><span class="line">    pushl %ecx      # push %ebx,%ecx,%edx as parameters</span><br><span class="line">    pushl %ebx      # to the system call</span><br><span class="line">    movl $0x10,%edx     # set up ds,es to kernel space</span><br><span class="line">    mov %dx,%ds</span><br><span class="line">    mov %dx,%es</span><br><span class="line">    movl $0x17,%edx     # fs points to local data space</span><br><span class="line">    mov %dx,%fs</span><br><span class="line">    call _sys_call_table(,%eax,4)</span><br><span class="line">    pushl %eax</span><br><span class="line">    movl _current,%eax</span><br><span class="line">    cmpl $0,state(%eax)     # state</span><br><span class="line">    jne reschedule</span><br><span class="line">    cmpl $0,counter(%eax)       # counter</span><br><span class="line">    je reschedule</span><br><span class="line">ret_from_sys_call:</span><br><span class="line">    movl _current,%eax      # task[0] cannot have signals</span><br><span class="line">    cmpl _task,%eax</span><br><span class="line">    je 3f</span><br><span class="line">    cmpw $0x0f,CS(%esp)     # was old code segment supervisor ?</span><br><span class="line">    jne 3f</span><br><span class="line">    cmpw $0x17,OLDSS(%esp)      # was stack segment = 0x17 ?</span><br><span class="line">    jne 3f</span><br><span class="line">    movl signal(%eax),%ebx</span><br><span class="line">    movl blocked(%eax),%ecx</span><br><span class="line">    notl %ecx</span><br><span class="line">    andl %ebx,%ecx</span><br><span class="line">    bsfl %ecx,%ecx</span><br><span class="line">    je 3f</span><br><span class="line">    btrl %ecx,%ebx</span><br><span class="line">    movl %ebx,signal(%eax)</span><br><span class="line">    incl %ecx</span><br><span class="line">    pushl %ecx</span><br><span class="line">    call _do_signal</span><br><span class="line">    popl %eax</span><br><span class="line">3:  popl %eax</span><br><span class="line">    popl %ebx</span><br><span class="line">    popl %ecx</span><br><span class="line">    popl %edx</span><br><span class="line">    pop %fs</span><br><span class="line">    pop %es</span><br><span class="line">    pop %ds</span><br><span class="line">    iret</span><br></pre></td></tr></table></figure>
+
+<p>sys_fork先是找到了空闲的task，然后进行copy，copy的方法比较长，基本上就是元信息(状态、id、counter)和tss的复制；首先需要为这个task_struct分配内存get_free_page，即在mem_map映射表中找到一页空闲的；</p>
+<p>原来，为每一个进程分配一个4k页，进程的堆栈栈顶指针指向页顶端</p>
+<blockquote>
+<p>原来mem_map映射的物理页，内核和用户态可以随机分布，但是通过段描述符来识别这个页的特权级</p>
+<p>栈指针指向顶端这样就可以向下增加</p>
+</blockquote>
+<p>copy进程函数还copy_mem，设置了LDT在线性空间的地址和大小：nr * 0x4000000（64MB）</p>
+<p>然后<strong>copy_page，这个函数比较重要：因为虽然进程0占640K，线性地址从0开始，但是进程1的线性地址从64MB开始，这里需要将他们的线性地址最终都映射到物理地址0-64MB，才能正确运行</strong></p>
+<p>最后还将页表项变成只读，并且直接赋值给新进程——<strong>写时复制</strong>，进程0到进程1只复制160项，后面的都复制1024项，也就是</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">_sys_fork:</span><br><span class="line">    call _find_empty_process</span><br><span class="line">    testl %eax,%eax</span><br><span class="line">    js 1f</span><br><span class="line">    push %gs</span><br><span class="line">    pushl %esi</span><br><span class="line">    pushl %edi</span><br><span class="line">    pushl %ebp</span><br><span class="line">    pushl %eax</span><br><span class="line">    call _copy_process</span><br><span class="line">    addl $20,%esp</span><br><span class="line">1:  ret</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fn_ptr sys_call_table[] = &#123; sys_setup, sys_exit, sys_fork, sys_read,</span><br><span class="line">  sys_write, sys_open, sys_close, sys_waitpid, sys_creat, sys_link,</span><br><span class="line">  sys_unlink, sys_execve, sys_chdir, sys_time, sys_mknod, sys_chmod,</span><br><span class="line">  sys_chown, sys_break, sys_stat, sys_lseek, sys_getpid, sys_mount,</span><br><span class="line">  sys_umount, sys_setuid, sys_getuid, sys_stime, sys_ptrace, sys_alarm,</span><br><span class="line">  sys_fstat, sys_pause, sys_utime, sys_stty, sys_gtty, sys_access,</span><br><span class="line">  sys_nice, sys_ftime, sys_sync, sys_kill, sys_rename, sys_mkdir,</span><br><span class="line">  sys_rmdir, sys_dup, sys_pipe, sys_times, sys_prof, sys_brk, sys_setgid,</span><br><span class="line">  sys_getgid, sys_signal, sys_geteuid, sys_getegid, sys_acct, sys_phys,</span><br><span class="line">  sys_lock, sys_ioctl, sys_fcntl, sys_mpx, sys_setpgid, sys_ulimit,</span><br><span class="line">  sys_uname, sys_umask, sys_chroot, sys_ustat, sys_dup2, sys_getppid,</span><br><span class="line">  sys_getpgrp, sys_setsid, sys_sigaction, sys_sgetmask, sys_ssetmask,</span><br><span class="line">  sys_setreuid, sys_setregid</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>在 unistd.h 头文件里，还定义了 syscall0 ~ syscall3 一共四个宏。数字代码参数个数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#define _syscall0(type,name)</span><br><span class="line">#define _syscall1(type,name,atype,a)</span><br><span class="line">#define _syscall2(type,name,atype,a,btype,b)</span><br><span class="line">#define _syscall3(type,name,atype,a,btype,b,ctype,c)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h3 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h3><blockquote>
+<p>整个操作系统就是一个死循环，其他所有事情都是由操作系统提前注册的中断机制和其对应的中断处理函数完成</p>
+</blockquote>
+<p>根据intel手册CPU提供两种中断机制，中断和异常</p>
+<ul>
+<li>中断：异步事件，通常由IO设备触发（点击鼠标）</li>
+<li>异常：同步时间，是 CPU 在执行指令时检测到的反常条件（故障、陷阱、中止）</li>
+<li>INT：通过这条指令直接给CPU发送中断号</li>
+</ul>
+<p>我们常把上面两个叫做硬中断，INT叫做软中断</p>
+<p><strong>本质：</strong></p>
+<p>都是传递给CPU中断信息和中断号</p>
+<blockquote>
+<p>例如，可编程中断控制器，多个IRQ引脚线连着各种设备（鼠标键盘等），每个IRQ对应一个中断号，当设备发送信号时，就给CPU的INTR引脚传递中断号</p>
+</blockquote>
+<p><strong>CPU如何处理：</strong></p>
+<p>CPU收到中断号后根据idtr寄存器去中断描述符表找到<strong>中断描述符</strong>，其中包含了段选择子和偏移地址，段选择子根据gdtr寄存器去全局描述符表找到<strong>段描述符</strong>，其中包含基地址。</p>
+<p>基地址+偏移地址 &#x3D; 程序入口地址</p>
+<hr>
+<p>中断描述符表：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct desc_struct &#123;</span><br><span class="line">    unsigned long a,b;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>一个描述符就是64位，分为三类：</p>
+<p><strong>Task Gate</strong>：任务门描述符</p>
+<p><strong>Interrupt Gate</strong>：中断门描述符————无法嵌套中断</p>
+<p><strong>Trap Gate</strong>：陷阱门描述符————可以嵌套中断</p>
+<img src="C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250805233912735.png" alt="image-20250805233912735" style="zoom: 67%;" />
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">idt_descr:</span><br><span class="line">    .word 256 * 8 - 1</span><br><span class="line">    .long idt_table</span><br><span class="line">    </span><br><span class="line">lidt idt_descr</span><br></pre></td></tr></table></figure>
+
+<p>idtr寄存器结构为16为位的长度+32位的地址，lidt将这个结构存入寄存器中</p>
+<hr>
+<p>找到中断描述符后进行压栈操作：</p>
+<p><img src="C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20250805234729648.png" alt="image-20250805234729648"></p>
+<p>最后IRET或者IRETD指令返回，做了两件事：1、出栈；2、赋值给eip、cs、eflags</p>
+<blockquote>
+</blockquote>
+<h3 id="outb-p"><a href="#outb-p" class="headerlink" title="outb_p"></a>outb_p</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p><code>outb_p</code> 是 x86 架构下的 <strong>带延迟的 I&#x2F;O 端口输出函数</strong>，用于向硬件设备的寄存器写入一个字节（8 位）数据，并在写入后插入一个短暂的延迟。其典型实现如下（以 Linux 内核为例）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#define outb_p(value, port) \</span><br><span class="line">    do &#123; outb(value, port); slow_down_io(); &#125; while (0)</span><br></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<ul>
+<li><code>outb(value, port)</code>：直接向指定端口写入数据。</li>
+<li><code>slow_down_io()</code>：插入延迟（通常通过 <code>nop</code> 指令或 <code>jmp</code> 到下一个语句实现）。x86 的早期硬件设备（如 PIC、PATA、定时器）响应速度较慢，<code>outb_p</code> 的延迟能防止 CPU 写入过快导致设备未及时处理指令。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x86：通常为 asm volatile (&quot;jmp 1f\n\t1: jmp 1f\n\t1:&quot; : : );（两条跳转指令）</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a><strong>使用场景</strong></h4><p><code>outb_p</code> 主要用于与 <strong>Legacy x86 硬件</strong> 交互，典型场景包括：</p>
+<table>
+<thead>
+<tr>
+<th align="left"><strong>硬件设备</strong></th>
+<th align="left"><strong>用途</strong></th>
+<th align="left"><strong>示例代码</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>8259A PIC</strong></td>
+<td align="left">配置中断屏蔽字（IMR）或初始化中断控制器</td>
+<td align="left"><code>outb_p(inb_p(0x21) &amp; 0xfb, 0x21); // 允许IRQ2</code></td>
+</tr>
+<tr>
+<td align="left"><strong>IDE 硬盘控制器 (PATA)</strong></td>
+<td align="left">设置硬盘参数（扇区、柱面、磁头）或发送命令</td>
+<td align="left"><code>outb_p(nsect, 0x1f2); // 写入扇区数</code></td>
+</tr>
+<tr>
+<td align="left"><strong>8253&#x2F;8254 PIT (定时器)</strong></td>
+<td align="left">设置定时器频率（如系统时钟）或工作模式</td>
+<td align="left"><code>outb_p(0x36, 0x43); // 模式3，方波发生器</code></td>
+</tr>
+<tr>
+<td align="left"><strong>串口&#x2F;UART</strong></td>
+<td align="left">配置波特率或控制寄存器</td>
+<td align="left"><code>outb_p(0x80, 0x3F8 + 3); // 设置DLAB位</code></td>
+</tr>
+</tbody></table>
+<h4 id="现代系统的演进"><a href="#现代系统的演进" class="headerlink" title="现代系统的演进"></a><strong>现代系统的演进</strong></h4><ul>
+<li><strong>硬件抽象层</strong>：<br>现代操作系统（如 Linux）通过 <code>io.h</code> 或设备驱动框架封装端口操作，开发者无需直接调用 <code>outb_p</code>。</li>
+<li><strong>替代技术</strong>：<ul>
+<li><strong>中断控制</strong>：APIC&#x2F;MSI 取代 8259A PIC。</li>
+<li><strong>存储接口</strong>：AHCI&#x2F;NVMe 取代 PATA，使用内存映射寄存器（MMIO）。</li>
+<li><strong>定时器</strong>：HPET 或 ACPI 电源管理定时器取代 PIT。</li>
+</ul>
+</li>
+<li><strong>保留场景</strong>：<br>仍用于 <strong>引导加载程序</strong>、<strong>Legacy 设备驱动</strong> 或 <strong>嵌入式开发</strong>。</li>
+</ul>
+</article><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/covers/14.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/hot100/" title="hot100"><img class="cover" src="/img/covers/17.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">hot100</div></div><div class="info-2"><div class="info-item-1">  力扣热题100题型类别心得： 1、哈希表：哈希表的使用是为了O(1)获取已经遍历过的信息 如两数之和&#x3D;target，暴力直接两个for循环去找到两个和为目标值的数，也就是遍历数组，拿当前数又去遍历一遍后面的数，实际上这些数的信息在第一次遍历时就已经得到了，暴力解法没有保留这些信息以至于每次都要重新获取；哈希表让机器有了信息记忆。我们得出减少一层循环，优化时间复杂度的一个办法就是记忆已经遍历过的信息 再比如要求最长连续序列，就要从最小值开始数最长的连续序列，而这恰好是数组排序O(n^2)，获取连续序列也就是要知道这个数的上一个和下一个，而通过两个哈希表就可以记录这段连续序列的左边界和右边界，同时更新左右边界 2、双指针 双指针有几种常见的题型，同向双指针，相向双指针，滑动窗口~ 相向双指针常见于求取一段范围中的值。例如盛水容器和接雨水，就是木桶问题，盛水的多少决定于最短木板，不断更新最短的木板即可 同双双指针常见快慢指针，追及问题等 滑动窗口一般分为定长和不定长，一般我都用不定长的方式来写，然后加上当r-l等于值时就取值 </div></div></div></a><a class="pagination-related" href="/asio/" title="asio"><img class="cover" src="/img/covers/1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">asio</div></div><div class="info-2"><div class="info-item-1"> 介绍传统的socket编程如下： 1、通过一个socket地址结构绑定了ip和地址以及协议族 12345678const char *ip = argv[1];int port = atoi(argv[2]);struct sockaddr_in server_address;bzero(&amp;server_address, sizeof(server_address));server_address.sin_family = AF_INET;server_address.sin_port = htons(port);inet_pton(AF_INET, ip, &amp;server_address.sin_addr);  2、服务端调用获取sockfd，通过socket  –》  bind –》  listen  获取连接 123456int sockfd = socket(PF_INET, SOCK_STREAM, 0);assert(sockfd &gt;= 0);int ret = bind(sockfd, (struct sockaddr...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%80%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">开机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bootsect"><span class="toc-number">2.</span> <span class="toc-text">bootsect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#setup"><span class="toc-number">3.</span> <span class="toc-text">setup</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#system"><span class="toc-number">4.</span> <span class="toc-text">system</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#main%E5%87%BD%E6%95%B0"><span class="toc-number">5.</span> <span class="toc-text">main函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E4%BF%9D%E5%AD%98%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF"><span class="toc-number">5.1.</span> <span class="toc-text">1、保存设备信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E4%B8%BB%E5%AD%98%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">5.2.</span> <span class="toc-text">2、主存初始化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E5%90%84%E4%B8%AA%E6%A8%A1%E5%9D%97%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%EF%BC%9A"><span class="toc-number">5.3.</span> <span class="toc-text">3、各个模块的初始化：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD%E5%88%9D%E5%A7%8B%E5%8C%96%EF%BC%9A"><span class="toc-number">5.3.1.</span> <span class="toc-text">中断初始化：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9D%97%E8%AE%BE%E5%A4%87%E5%88%9D%E5%A7%8B%E5%8C%96%E2%80%94%E2%80%94%E8%AF%BB%E7%A1%AC%E7%9B%98"><span class="toc-number">5.3.2.</span> <span class="toc-text">块设备初始化——读硬盘</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E5%8F%B0%E5%88%9D%E5%A7%8B%E5%8C%96%E2%80%94%E2%80%94%E9%94%AE%E7%9B%98%E8%BE%93%E5%87%BA"><span class="toc-number">5.3.3.</span> <span class="toc-text">控制台初始化——键盘输出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E5%88%9D%E5%A7%8B%E5%8C%96%E2%80%94%E2%80%94%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E6%97%B6%E9%97%B4"><span class="toc-number">5.3.4.</span> <span class="toc-text">时间初始化——获取当前时间</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">5.3.5.</span> <span class="toc-text">进程调度初始化</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E5%8C%BA%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">5.3.6.</span> <span class="toc-text">缓存区初始化</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%A1%AC%E7%9B%98%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">5.3.7.</span> <span class="toc-text">硬盘初始化</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E5%88%87%E6%8D%A2%E7%94%A8%E6%88%B7%E6%A8%A1%E5%BC%8F"><span class="toc-number">6.</span> <span class="toc-text">4、切换用户模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81init%E8%BF%9B%E7%A8%8B"><span class="toc-number">7.</span> <span class="toc-text">5、init进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD"><span class="toc-number">8.</span> <span class="toc-text">中断</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#outb-p"><span class="toc-number">9.</span> <span class="toc-text">outb_p</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89"><span class="toc-number">9.1.</span> <span class="toc-text">定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">9.2.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%8E%B0%E4%BB%A3%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%BC%94%E8%BF%9B"><span class="toc-number">9.3.</span> <span class="toc-text">现代系统的演进</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Jerold</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
