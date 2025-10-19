@@ -1,0 +1,312 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>设备树 | Jerold‘s PNote</title><meta name="author" content="Jerold"><meta name="copyright" content="Jerold"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="https:&#x2F;&#x2F;blog.csdn.net&#x2F;m0_74712453&#x2F;article&#x2F;details&#x2F;145589379 介绍每一款开发板需要修改许多c文件代码去适配，这些代码文件放在arch&#x2F;arm&#x2F;mxch-xxx目录总中，使得内核越来越臃肿；引入设备树，将板级信息的文件与linux内核代码分离，描述板子的细节，比如CPU 数量、外设基地址、总线设备等，放在dts这种数据结构中，用到时dts将硬">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设备树">
+<meta property="og:url" content="http://example.com/linux_driver/dts/index.html">
+<meta property="og:site_name" content="Jerold‘s PNote">
+<meta property="og:description" content="https:&#x2F;&#x2F;blog.csdn.net&#x2F;m0_74712453&#x2F;article&#x2F;details&#x2F;145589379 介绍每一款开发板需要修改许多c文件代码去适配，这些代码文件放在arch&#x2F;arm&#x2F;mxch-xxx目录总中，使得内核越来越臃肿；引入设备树，将板级信息的文件与linux内核代码分离，描述板子的细节，比如CPU 数量、外设基地址、总线设备等，放在dts这种数据结构中，用到时dts将硬">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/covers/13.jpg">
+<meta property="article:published_time" content="2025-10-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-10-19T16:00:00.000Z">
+<meta property="article:author" content="Jerold">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/covers/13.jpg"><link rel="shortcut icon" href="/img/logo.jpg"><link rel="canonical" href="http://example.com/linux_driver/dts/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const hour = new Date().getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (theme === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else theme === 'light' ? activateLightMode() : activateDarkMode()
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '设备树',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  isShuoshuo: false
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bg2.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/head.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/13.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Jerold‘s PNote</span></a><a class="nav-page-title" href="/"><span class="site-name">设备树</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">设备树</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-19T16:00:00.000Z" title="发表于 2025-10-20 2025-10-20T00:00:00+08:00">2025-10-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-10-19T16:00:00.000Z" title="更新于 2025-10-20 2025-10-20T00:00:00+08:00">2025-10-20</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_74712453/article/details/145589379">https://blog.csdn.net/m0_74712453/article/details/145589379</a></p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>每一款开发板需要修改许多c文件代码去适配，这些代码文件放在<code>arch/arm/mxch-xxx</code>目录总中，使得内核越来越臃肿；引入<strong>设备树</strong>，将板级信息的文件与linux内核代码分离，描述板子的细节，比如CPU 数量、外设基地址、总线设备等，放在<strong>dts这种数据结构</strong>中，用到时dts将硬件细节传输给内核</p>
+<blockquote>
+<p>dts不是直接和内核联系，而是通过bootloader将编译后的文件传输给kernel</p>
+</blockquote>
+<p><img src="C:/Users/ben/AppData/Roaming/Typora/typora-user-images/image-20251020004804745.png" alt="image-20251020004804745"></p>
+<p><strong>DTS、DTSI、DTB</strong></p>
+<p>DTS：设备树描述文件为.dts格式，一般一个dts对应一个arm设备，放置在内核的arch&#x2F;arm&#x2F;boot&#x2F;dts&#x2F;目录中</p>
+<p>DTSI： 头文件，引入不同板子的commin部分，比如描述imx6null芯片</p>
+<p>DTB：用dtc工具将dts，dtsi源码编译成.dtb文件，可以被内核解析的二进制文件</p>
+<h2 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h2><p>设备树是由一个个节点组成的，每个节点相当于树上的一片叶子，通过指定从根节点到所有子节点到所需节点的完整路径，可以唯一地标识设备树中的节点：<code>/node-name-1/node-name-2/node-name-N</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/dts-v1/;                // 表示版本</span><br><span class="line">[memory reservations]    // 格式为: /memreserve/ &lt;address&gt; &lt;length&gt;;</span><br><span class="line">/ &#123;</span><br><span class="line">    [property definitions]</span><br><span class="line">    [child nodes]</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>节点的结构和约定如下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[label:] node-name[@unit-address] &#123;</span><br><span class="line">    [properties definitions]</span><br><span class="line">    [child nodes]</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">/ &#123;</span><br><span class="line">	uart0: uart@fe001000 &#123;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;;</span><br><span class="line">&amp;uart0 &#123;</span><br><span class="line">	status = &quot;ok&quot;;</span><br><span class="line">&#125;;</span><br><span class="line">&amp;&#123;/uart@fe001000&#125; &#123;&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>unit-address</code>表示设备地址或者寄存器首地址（具体节点具体分析，不一定是绝对地址），必须与节点 reg 属性中指定的首地址匹配。</p>
+<p>label是标号，作用是方便引用node</p>
+<h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>每个节点都有用来描述节点信息的属性，属性由名称和值两部分组成</p>
+<p>1、<strong>compatible</strong></p>
+<p>compatible 属性值由 string list 组成，定义了设备的兼容性，推荐格式为<code>manufacturer,model</code>，manufacturer 描述了生产商，model 描述了型号。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compatible = &quot;fsl,imx6ull-14x14-evk&quot;, &quot;fsl,imx6ull&quot;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>compatible属性用于将设备和驱动绑定起来。</strong>一般驱动程序文件都会有一个 OF 匹配表，此 OF 匹配表保存着一些 compatible 值，如果设备节点的 compatible 属性值核和OF 匹配表中的任何一个值相等，那么就表示这个设备可以使用这个驱动。</p>
+<p>2、<strong>model</strong></p>
+<p>model 属性值是一个 string，指明了设备的厂商和型号，推荐格式为<code>manufacturer,model</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model = &quot;Freescale i.MX6 ULL 14x14 EVK Board&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>3、<strong>phandle</strong></p>
+<p>phandle 属性值是一个 u32，为设备树中唯一的节点指定一个数字标识符，用于其它节点指明关系。</p>
+<p>4、<strong>status</strong></p>
+<p>status 属性值是一个 string，表示设备的运行状态，可用值如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;okay&quot;</span><br><span class="line">&quot;disabled&quot;</span><br><span class="line">&quot;faile&quot;</span><br><span class="line">&quot;fail-sss&quot;</span><br></pre></td></tr></table></figure>
+
+<p>5、**#address-cells 和 #size-cells**</p>
+<p>#address-cells 和#size-cells 属性值是一个 u32，<strong>可以用在任何拥有子节点的设备中，并描述子设备节点应该如何寻址</strong>。</p>
+<p><code>#address-cells</code>属性定义<strong>子节点 reg 属性</strong>中<strong>地址字段</strong>所占用的字长，也就是占用 u32 单元格的数量。</p>
+<p><code>#size-cells</code>属性定义<strong>子节点 reg 属性值</strong>的<strong>长度</strong>所占用的 u32 单元格的数量。</p>
+<p>6、<strong>reg</strong></p>
+<p>定义设备的寄存器地址范围（物理地址），内核通过该属性映射寄存器到虚拟地址，供驱动访问。</p>
+<p><code>reg = &lt;基地址高32位 基地址低32位 大小高32位 大小低32位&gt;;</code>（64 位系统，32 位系统简化为 <code>&lt;基地址 大小&gt;</code>）。</p>
+<h2 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h2><p>1）<strong>根节点</strong></p>
+<p>树是由树根开始的，在设备树中称之为根节点，路径为<code>/</code>，根节点不需要节点名称，所有子节点都是挂在根节点上的，可以看到最简单的根节点如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#address-cells</span><br><span class="line">#size-cells</span><br><span class="line">model</span><br><span class="line">capatible</span><br></pre></td></tr></table></figure>
+
+<p>（2）<strong>aliases</strong></p>
+<p>aliases 节点用来定义一个或多个别名属性，为了内核方便访问节点。</p>
+<p>按照约定，该节点应该在根节点上。</p>
+<p>（3）<strong>chosen</strong></p>
+<p>chosen 节点是为了<strong>uboot 向 Linux 内核传递数据</strong>，重点是 bootargs 参数，一般.dts 文件中 chosen 节点通常为空或者内容很少。</p>
+<p>（4）<strong>cpus</strong></p>
+<p>cpus 节点<strong>所有的设备树都需要 cpus 节点</strong>，用来描述系统的 CPU 信息。</p>
+<h2 id="系统运行"><a href="#系统运行" class="headerlink" title="系统运行"></a>系统运行</h2><p>Linux 内核启动的时候会解析设备树 dtb 文件，所以启动以后可以在根文件系统中看到设备树的节点信息，在<code>/proc/device-tree</code>目录中：</p>
+<p>这里 device-tree 目录是一个软链接，实际指向<code>/sys/firmware/devicetree/base</code>目录。</p>
+<p>在 device-tree 目录中，首先可以看到设备树根节点下的<strong>所有一级子节点。</strong></p>
+<p>（1）<strong>属性是以文件的方式给出</strong>，可以直接查看。</p>
+<p>（2）<strong>节点以目录的方式给出</strong>。</p>
+<h2 id="OF函数"><a href="#OF函数" class="headerlink" title="OF函数"></a>OF函数</h2><p>Linux 内核提供了一系列的函数来获取设备树中的节点或者属性信息，这一系列的函数都有一个统一的前缀<code>of_</code>，所以也称为 OF 函数，声明在文件<code>include/linux/of.h</code>文件中。</p>
+<h3 id="1-内核对于设备树节点的描述"><a href="#1-内核对于设备树节点的描述" class="headerlink" title="1. 内核对于设备树节点的描述"></a><strong>1. 内核对于设备树节点的描述</strong></h3><p>Linux 内核使用 device_node 结构体来描述一个设备树节点，定义在文件<code>include/linux/of.h</code>文件中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">struct device_node &#123;</span><br><span class="line"> const char *name;</span><br><span class="line"> const char *type;</span><br><span class="line"> phandle phandle;</span><br><span class="line"> const char *full_name;</span><br><span class="line"> struct fwnode_handle fwnode;</span><br><span class="line"></span><br><span class="line"> struct property *properties;</span><br><span class="line"> struct property *deadprops; /* removed properties */</span><br><span class="line"> struct device_node *parent;</span><br><span class="line"> struct device_node *child;</span><br><span class="line"> struct device_node *sibling;</span><br><span class="line"> struct kobject kobj;</span><br><span class="line"> unsigned long _flags;</span><br><span class="line"> void *data;</span><br><span class="line">#if defined(CONFIG_SPARC)</span><br><span class="line"> const char *path_component_name;</span><br><span class="line"> unsigned int unique_id;</span><br><span class="line"> struct of_irq_controller *irq_trans;</span><br><span class="line">#endif</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-查找节点"><a href="#2-查找节点" class="headerlink" title="2. 查找节点"></a><strong>2. 查找节点</strong></h3><p>（1）<strong>通过节点名字查找节点</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extern struct device_node *of_find_node_by_name(struct device_node *from,</span><br><span class="line"> const char *name);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>from：开始查找的节点，NULL 表示根节点</li>
+<li>name：要查找的节点名称</li>
+</ul>
+<p>返回值为找到的节点，NULL 为查找失败。</p>
+<p>（2）<strong>通过节点类型查找节点</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extern struct device_node *<span class="title function_">of_find_node_by_type</span>(struct device_node *<span class="keyword">from</span>,</span><br><span class="line"> <span class="keyword">const</span> char *type);</span><br></pre></td></tr></table></figure>
+
+<p>type 参数指定要查看节点对应的 type 字符串，也就是 device_type 属性值。</p>
+<p>（3）<strong>通过 device_type 和 compatible 查找节点</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extern struct device_node *<span class="title function_">of_find_compatible_node</span>(struct device_node *<span class="keyword">from</span>,</span><br><span class="line"> <span class="keyword">const</span> char *type, <span class="keyword">const</span> char *compat);</span><br></pre></td></tr></table></figure>
+
+<p>（4）<strong>通过 of_device_id 匹配表来查找节点</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">extern struct device_node *<span class="title function_">of_find_matching_node_and_match</span>(</span><br><span class="line"> struct device_node *<span class="keyword">from</span>,</span><br><span class="line"> <span class="keyword">const</span> struct of_device_id *matches,</span><br><span class="line"> <span class="keyword">const</span> struct of_device_id **match);</span><br></pre></td></tr></table></figure>
+
+<p>（5）<strong>通过路径来查找节点</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> inline struct device_node *<span class="title function_">of_find_node_by_path</span>(<span class="params"><span class="keyword">const</span> char *path</span>)</span><br><span class="line">&#123;</span><br><span class="line"> <span class="keyword">return</span> <span class="title function_">of_find_node_opts_by_path</span>(path, <span class="variable constant_">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的 path 必须要是绝对路径。</p>
+<h3 id="3-获取父子节点"><a href="#3-获取父子节点" class="headerlink" title="3. 获取父子节点"></a><strong>3. 获取父子节点</strong></h3><p>（1）<strong>获取父节点</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">extern struct device_node *<span class="title function_">of_get_parent</span>(<span class="keyword">const</span> struct device_node *node);</span><br></pre></td></tr></table></figure>
+
+<p>（2）<strong>迭代查找子节点</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extern struct device_node *<span class="title function_">of_get_next_child</span>(<span class="keyword">const</span> struct device_node *node,</span><br><span class="line">          struct device_node *prev);</span><br></pre></td></tr></table></figure>
+
+<p>prev 参数是前一个子节点，如果为 NULL 表示从第一个子节点开始。</p>
+<h3 id="4-提取属性值"><a href="#4-提取属性值" class="headerlink" title="4. 提取属性值"></a><strong>4. 提取属性值</strong></h3><p>在节点描述类型 device_node 中，有这样一项用来描述属性值：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">struct property *properties;</span><br></pre></td></tr></table></figure>
+
+<p>property 结构体类型定义如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">struct property &#123;</span><br><span class="line"> char *name;</span><br><span class="line"> int length;</span><br><span class="line"> <span class="keyword">void</span> *value;</span><br><span class="line"> struct property *next;</span><br><span class="line"> unsigned long _flags;</span><br><span class="line"> unsigned int unique_id;</span><br><span class="line"> struct bin_attribute attr;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>（1）<strong>查找指定节点的属性</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">extern struct property *<span class="title function_">of_find_property</span>(<span class="keyword">const</span> struct device_node *np,</span><br><span class="line">      <span class="keyword">const</span> char *name,</span><br><span class="line">      int *lenp);</span><br></pre></td></tr></table></figure>
+
+<p>参数 name 指属性名字，lenp 指属性值的字节数。</p>
+<p>（2）<strong>获取属性中元素的数量</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extern int <span class="title function_">of_property_count_elems_of_size</span>(<span class="keyword">const</span> struct device_node *np,</span><br><span class="line">    <span class="keyword">const</span> char *propname, int elem_size);</span><br></pre></td></tr></table></figure>
+
+<p>参数 propname 是需要统计元素数量的属性名字，参数 elem_size 是元素的长度。</p>
+<p>返回值是获取到的属性元素数量。</p>
+<p>eg. reg 属性的值通常是一个数组，使用此函数可以获取的数组的大小。</p>
+<p>（3）<strong>从属性中获取指定索引的 u32 类型数据值</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">extern int <span class="title function_">of_property_read_u32_index</span>(<span class="keyword">const</span> struct device_node *np,</span><br><span class="line">           <span class="keyword">const</span> char *propname,</span><br><span class="line">           u32 index, u32 *out_value);</span><br></pre></td></tr></table></figure>
+
+<p>参数 out_value 用来返回获取到的值。</p>
+<p>返回值用来表示是否获取成功。</p>
+<p>（4）<strong>从属性中获取数组值</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">extern int <span class="title function_">of_property_read_u8_array</span>(<span class="keyword">const</span> struct device_node *np,</span><br><span class="line">   <span class="keyword">const</span> char *propname, u8 *out_values, size_t sz);</span><br><span class="line">extern int <span class="title function_">of_property_read_u16_array</span>(<span class="keyword">const</span> struct device_node *np,</span><br><span class="line">   <span class="keyword">const</span> char *propname, u16 *out_values, size_t sz);</span><br><span class="line">extern int <span class="title function_">of_property_read_u32_array</span>(<span class="keyword">const</span> struct device_node *np,</span><br><span class="line">          <span class="keyword">const</span> char *propname,</span><br><span class="line">          u32 *out_values,</span><br><span class="line">          size_t sz);</span><br><span class="line">extern int <span class="title function_">of_property_read_u64_array</span>(<span class="keyword">const</span> struct device_node *np,</span><br><span class="line">          <span class="keyword">const</span> char *propname,</span><br><span class="line">          u64 *out_values,</span><br><span class="line">          size_t sz);</span><br></pre></td></tr></table></figure>
+
+<p>eg. reg 属性的值通常是一个数组，使用这个函数可以一次读取出一个数组，也就是 reg 属性的全部值。</p>
+<p>（5）<strong>从属性中获取布尔值&#x2F;整形值</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * of_property_read_bool - Findfrom a property</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@np</span>:  device node from which the property value is to be read.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@propname</span>: name of the property to be searched.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Search for a property in a device node.</span></span><br><span class="line"><span class="comment"> * Returns true if the property exist false otherwise.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">static</span> inline bool <span class="title function_">of_property_read_bool</span>(<span class="params"><span class="keyword">const</span> struct device_node *np,</span></span><br><span class="line"><span class="params">      <span class="keyword">const</span> char *propname</span>)</span><br><span class="line">&#123;</span><br><span class="line"> struct property *prop = <span class="title function_">of_find_property</span>(np, propname, <span class="variable constant_">NULL</span>);</span><br><span class="line"></span><br><span class="line"> <span class="keyword">return</span> prop ? <span class="literal">true</span> : <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> inline int <span class="title function_">of_property_read_u8</span>(<span class="params"><span class="keyword">const</span> struct device_node *np,</span></span><br><span class="line"><span class="params">           <span class="keyword">const</span> char *propname,</span></span><br><span class="line"><span class="params">           u8 *out_value</span>)</span><br><span class="line">&#123;</span><br><span class="line"> <span class="keyword">return</span> <span class="title function_">of_property_read_u8_array</span>(np, propname, out_value, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> inline int <span class="title function_">of_property_read_u16</span>(<span class="params"><span class="keyword">const</span> struct device_node *np,</span></span><br><span class="line"><span class="params">           <span class="keyword">const</span> char *propname,</span></span><br><span class="line"><span class="params">           u16 *out_value</span>)</span><br><span class="line">&#123;</span><br><span class="line"> <span class="keyword">return</span> <span class="title function_">of_property_read_u16_array</span>(np, propname, out_value, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> inline int <span class="title function_">of_property_read_u32</span>(<span class="params"><span class="keyword">const</span> struct device_node *np,</span></span><br><span class="line"><span class="params">           <span class="keyword">const</span> char *propname,</span></span><br><span class="line"><span class="params">           u32 *out_value</span>)</span><br><span class="line">&#123;</span><br><span class="line"> <span class="keyword">return</span> <span class="title function_">of_property_read_u32_array</span>(np, propname, out_value, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> inline int <span class="title function_">of_property_read_s32</span>(<span class="params"><span class="keyword">const</span> struct device_node *np,</span></span><br><span class="line"><span class="params">           <span class="keyword">const</span> char *propname,</span></span><br><span class="line"><span class="params">           s32 *out_value</span>)</span><br><span class="line">&#123;</span><br><span class="line"> <span class="keyword">return</span> <span class="title function_">of_property_read_u32</span>(np, propname, (u32*) out_value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>（6）<strong>从属性中获取字符串</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">extern int <span class="title function_">of_property_read_string</span>(struct device_node *np,</span><br><span class="line">       <span class="keyword">const</span> char *propname,</span><br><span class="line">       <span class="keyword">const</span> char **out_string);</span><br></pre></td></tr></table></figure>
+
+<p>（7）<strong>获取#address-cells 和#size-cells 属性值</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extern int <span class="title function_">of_n_addr_cells</span>(struct device_node *np);</span><br><span class="line">extern int <span class="title function_">of_n_size_cells</span>(struct device_node *np);</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-地址相关操作"><a href="#6-地址相关操作" class="headerlink" title="6. 地址相关操作"></a><strong>6. 地址相关操作</strong></h3><p>地址相关操作的函数定义在<code>include/linux/of_address.h</code>文件中。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> inline <span class="keyword">const</span> __be32 *<span class="title function_">of_get_address</span>(struct device_node *dev, int index,</span><br><span class="line">     u64 *size, unsigned int *flags);</span><br></pre></td></tr></table></figure>
+
+<p>参数 index 是要读取的地址标号，size 是地址长度，flag 是是参数，比如 IORESOURCE_IO、IORESOURCE_MEM 等。</p>
+<p>返回值是读取到的数据首地址，为 NULL 则表示读取失败。</p>
+<p>（2）<strong>将从设备树读取到的地址转换为物理地址</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">extern u64 <span class="title function_">of_translate_address</span>(struct device_node *np, <span class="keyword">const</span> __be32 *addr);</span><br></pre></td></tr></table></figure>
+
+<p>返回值为转换得到的地址，如果为 OF_BAD_ADDR 的话表示转换失败。</p>
+<p>（3）<strong>将地址转换为 resources 资源</strong></p>
+<p>GPIO、IIC、SPI 这些外设都有对应的寄存器，这些寄存器就是一段内存空间，Linux 内核使用 resource 结构体来描述一段内存空间，定义在文件<code>include/linux/ioport.h</code>中。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Resources are tree-like, allowing</span></span><br><span class="line"><span class="comment"> * nesting etc..</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">struct resource &#123;</span><br><span class="line"> resource_size_t start;</span><br><span class="line"> resource_size_t end;</span><br><span class="line"> <span class="keyword">const</span> char *name;</span><br><span class="line"> unsigned long flags;</span><br><span class="line"> struct resource *parent, *sibling, *child;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<ul>
+<li>start：资源起始地址</li>
+<li>end：资源结束地址</li>
+<li>name：资源名称</li>
+<li>flags：资源类型</li>
+<li>链表节点，用于嵌套</li>
+</ul>
+<p>资源类型同样定义在文件<code>include/linux/ioport.h</code>中，如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * IO resources have these defined flags.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_BITS</span>  <span class="number">0x000000ff</span> <span class="comment">/* Bus-specific bits */</span></span><br><span class="line"></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_TYPE_BITS</span> <span class="number">0x00001f00</span> <span class="comment">/* Resource type */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_IO</span>  <span class="number">0x00000100</span> <span class="comment">/* PCI/ISA I/O ports */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_MEM</span>  <span class="number">0x00000200</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_REG</span>  <span class="number">0x00000300</span> <span class="comment">/* Register offsets */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_IRQ</span>  <span class="number">0x00000400</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_DMA</span>  <span class="number">0x00000800</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_BUS</span>  <span class="number">0x00001000</span></span><br><span class="line"></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_PREFETCH</span> <span class="number">0x00002000</span> <span class="comment">/* No side effects */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_READONLY</span> <span class="number">0x00004000</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_CACHEABLE</span> <span class="number">0x00008000</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_RANGELENGTH</span> <span class="number">0x00010000</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_SHADOWABLE</span> <span class="number">0x00020000</span></span><br><span class="line"></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_SIZEALIGN</span> <span class="number">0x00040000</span> <span class="comment">/* size indicates alignment */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_STARTALIGN</span> <span class="number">0x00080000</span> <span class="comment">/* start field is alignment */</span></span><br><span class="line"></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_MEM_64</span> <span class="number">0x00100000</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_WINDOW</span> <span class="number">0x00200000</span> <span class="comment">/* forwarded by bridge */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_MUXED</span> <span class="number">0x00400000</span> <span class="comment">/* Resource is software muxed */</span></span><br><span class="line"></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_EXCLUSIVE</span> <span class="number">0x08000000</span> <span class="comment">/* Userland may not map this resource */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_DISABLED</span> <span class="number">0x10000000</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_UNSET</span> <span class="number">0x20000000</span> <span class="comment">/* No address assigned yet */</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_AUTO</span>  <span class="number">0x40000000</span></span><br><span class="line">#define <span class="variable constant_">IORESOURCE_BUSY</span>  <span class="number">0x80000000</span> <span class="comment">/* Driver has marked this resource busy */</span></span><br></pre></td></tr></table></figure>
+
+<p>常用的资源是 IORESOURCE_MEM、IORESOURCE_REG、IORESOURCE_IRQ 三个。</p>
+<p>OF 函数中，可以将 reg 属性给出的地址转换为 resource 资源：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extern int <span class="title function_">of_address_to_resource</span>(struct device_node *dev, int index,</span><br><span class="line">      struct resource *r);</span><br></pre></td></tr></table></figure>
+
+<p>（4）<strong>虚拟地址映射</strong></p>
+<p>之前使用 ioremap 函数来完成物理地址到虚拟地址的映射，采用设备树以后，可以直接通过 of_iomap 来完成物理地址到虚拟地址的映射。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> __iomem *<span class="title function_">of_iomap</span>(struct device_node *node, int index);</span><br></pre></td></tr></table></figure>
+
+<p>参数 index 是 reg 属性中要完成内存映射的段，如果 reg 属性只有一段的话，index 就设置为 0。</p>
+<h3 id="7-其它常用-OF-函数"><a href="#7-其它常用-OF-函数" class="headerlink" title="7. 其它常用 OF 函数"></a><strong>7. 其它常用 OF 函数</strong></h3><p>（1）<strong>检查设备兼容性</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">extern int <span class="title function_">of_device_is_compatible</span>(<span class="keyword">const</span> struct device_node *device,</span><br><span class="line">       <span class="keyword">const</span> char *);</span><br></pre></td></tr></table></figure>
+
+<p>第二个参数用来指定要查看的字符串，该函数会检查指定的字符串是否在节点的 compatible 属性中。</p>
+</article><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/covers/13.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/linux_driver/edid/" title="edid"><img class="cover" src="/img/covers/9.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">edid</div></div></div></a><a class="pagination-related" href="/linux_driver/work_queue/" title="工作队列"><img class="cover" src="/img/covers/10.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">工作队列</div></div><div class="info-2"><div class="info-item-1">工作队列的介绍和使用：https://blog.csdn.net/xiaoheshang_123/article/details/147374327 详解：https://devpress.csdn.net/linux/66d02dcbc618435984a3a31b.html </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B1%9E%E6%80%A7"><span class="toc-number">3.</span> <span class="toc-text">属性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8A%82%E7%82%B9"><span class="toc-number">4.</span> <span class="toc-text">节点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E8%BF%90%E8%A1%8C"><span class="toc-number">5.</span> <span class="toc-text">系统运行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OF%E5%87%BD%E6%95%B0"><span class="toc-number">6.</span> <span class="toc-text">OF函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%86%85%E6%A0%B8%E5%AF%B9%E4%BA%8E%E8%AE%BE%E5%A4%87%E6%A0%91%E8%8A%82%E7%82%B9%E7%9A%84%E6%8F%8F%E8%BF%B0"><span class="toc-number">6.1.</span> <span class="toc-text">1. 内核对于设备树节点的描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%9F%A5%E6%89%BE%E8%8A%82%E7%82%B9"><span class="toc-number">6.2.</span> <span class="toc-text">2. 查找节点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%8E%B7%E5%8F%96%E7%88%B6%E5%AD%90%E8%8A%82%E7%82%B9"><span class="toc-number">6.3.</span> <span class="toc-text">3. 获取父子节点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%8F%90%E5%8F%96%E5%B1%9E%E6%80%A7%E5%80%BC"><span class="toc-number">6.4.</span> <span class="toc-text">4. 提取属性值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E5%9C%B0%E5%9D%80%E7%9B%B8%E5%85%B3%E6%93%8D%E4%BD%9C"><span class="toc-number">6.5.</span> <span class="toc-text">6. 地址相关操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%85%B6%E5%AE%83%E5%B8%B8%E7%94%A8-OF-%E5%87%BD%E6%95%B0"><span class="toc-number">6.6.</span> <span class="toc-text">7. 其它常用 OF 函数</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By Jerold</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
